@@ -4,10 +4,10 @@ import elasticsearch1 as ES
 import random
 
 def search_interval(time_s, time_e, fwd, host, index, host_t):
-    time_start=time_s
-    time_end=time_e
+    time_start = time_s
+    time_end = time_e
     #print time_start,"   ",time_end
-    host_all = "20.0.8."+str(host_t)
+    host_all = "20.0.8." + str(host_t)
     ES_SERVERS = [{
                     'host': host_all,
                         'port': 9200
@@ -19,7 +19,7 @@ def search_interval(time_s, time_e, fwd, host, index, host_t):
             
     index_all = "logstash-" + index
 
-    es_search_options = set_search_optional_interval(time_start, time_end, host, fwd)
+    es_search_options = set_search_optional_interval(time_start, time_end, host, fwd, host_t)
     es_result = get_search_result(es_search_options, index_all)
     final_result_host, final_result_message, final_result_time = get_result_list(es_result)
     return final_result_host, final_result_message, final_result_time
@@ -47,9 +47,14 @@ def get_result_list(es_result):
         final_result_time.append(str(item['_source']['@timestamp']))
     return final_result_host, final_result_message, final_result_time
 
-def set_search_optional_interval(time_start, time_end, host, fwd):
-    fwd_str = "20.0.2." + str(fwd)
-#    fwd_str = "20.0.2.94"
+def set_search_optional_interval(time_start, time_end, host, fwd, host_t):
+
+    if(host_t == 87):
+        fwd_str = "20.0.2." + str(fwd)
+    else:
+        fwd_str = "20.0.208." + str(fwd)
+
+    fwd_str = "20.0.208.72"
     print fwd_str
     match_fwd = {"match":{"host": fwd_str}}
     match_query = []

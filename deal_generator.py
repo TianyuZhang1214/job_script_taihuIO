@@ -13,7 +13,7 @@ MB_count = 1024*1024.0
 def deal_host(host):
     w = host.split('.')
     cmp_node = int(w[1]) * 1024 + int(w[2]) * 8 + int(w[3])
-    fwd = cmp_node//1024
+    fwd = cmp_node//512
 
     return fwd
 
@@ -50,8 +50,8 @@ def deal_single_message(results_message):
         elif("offset" not in results_message):
             try:
                 size = x[4].split("=")[1]
-                op_count = int(x[5].split("=")[1])
-                sumsize = int(size)
+                op_count = float(x[5].split("=")[1])
+                sumsize = float(size)
                 if("READ" in kee):
                     resultr = sumsize / MB_count
                     resultr_ops = op_count
@@ -68,9 +68,9 @@ def deal_single_message(results_message):
                 print e
         else:
             try:
-                size = int(x[5].split("=")[1])
-                op_count = int(x[7].split("=")[1])
-                sumsize = int(size)*op_count
+                size = float(x[5].split("=")[1])
+                op_count = float(x[7].split("=")[1])
+                sumsize = float(size)*op_count
                 if("READ" in kee):
                     resultr = 1.0*sumsize / MB_count
                     resultr_ops = op_count
@@ -121,8 +121,9 @@ def deal_single_message_fd(results_message):
             try:
                 fd = x[9]
             except Exception as e:
-                print x
-                print e
+#                print x
+#                print e
+                c = 1
         elif "RELEASE" in ke:
             result_close = 1
         elif("offset" not in results_message):
@@ -141,9 +142,9 @@ def deal_single_message_fd(results_message):
                     resultw_size = [sumsize/op_count*1.0,op_count]
                     dictw = [sumsize, op_count]
             except Exception as e:
-#                print ke
-                print x
-                print e
+#                print x
+#                print e
+                c = 1
         else:
             try:
                 size = int(x[5].split("=")[1])
@@ -163,13 +164,13 @@ def deal_single_message_fd(results_message):
                     fd = x[4]
             except Exception as e:
 #                print ke
-                print x
-                print e
-
+#                print x
+#                print e
+                c = 1
     except Exception as e:
-        print e 
-        print x 
-
+#        print e 
+#        print x 
+        c = 1
     return time, resultr, resultw, resultr_ops, resultw_ops, \
     result_open, result_close, resultr_size, resultw_size, dictr, dictw, \
     file_name, fd
@@ -206,24 +207,23 @@ def deal_all_message(results_message, results_host, min_time, max_time):
 #            print results_message[i]
         
         try:
+            index = int(time_to_sec(time[1:-1])) - min_time +1
             if(fd != 'NULL'):
                 fd_set.add(fd)
                 if(fd in fd_info):
                     if(file_name != 'NULL'):
                         fd_info[fd]['file_name'] = file_name
-                    if(time in fd_info[fd]['time']):
-                        fd_info[fd]['time'][time]['read'] += resultr_tmp
-                        fd_info[fd]['time'][time]['write'] += resultw_tmp
+                    if(index in fd_info[fd]['time']):
+                        fd_info[fd]['time'][index]['read'] += resultr_tmp
+                        fd_info[fd]['time'][index]['write'] += resultw_tmp
                     else:
-                        fd_info[fd]['time'][time] = {}
-                        fd_info[fd]['time'][time]['read'] = 0
-                        fd_info[fd]['time'][time]['write'] = 0
+                        fd_info[fd]['time'][index] = {}
+                        fd_info[fd]['time'][index]['read'] = 0
+                        fd_info[fd]['time'][index]['write'] = 0
                 else:
                     fd_info[fd] = {}
                     fd_info[fd]['time'] = {}
                     fd_info[fd]['file_name'] = ''
-            index = int(time_to_sec(time[1:-1])) - min_time +1
-#            print index
             result_open[index] += result_open_tmp
             result_close[index] += result_close_tmp
             resultr[index] += resultr_tmp
@@ -277,7 +277,6 @@ def deal_all_message(results_message, results_host, min_time, max_time):
             fd_info[fd]['start_time'] = '[0000-00-00 00:00:00]'
             fd_info[fd]['end_time'] = '[0000-00-00 00:00:00]'
             
-
     file_all_count = len(file_all_set)
     return resultr, resultw, resultr_ops, resultw_ops, result_open, result_close, \
     resultr_size, resultw_size, dictr, dictw, file_all_count, file_open, fd_info, \
@@ -417,16 +416,16 @@ def ost_deal_message(ost_message, ost_time, start_time, end_time):
 def fwd_deal_message(ost_message, ost_time, start_time, end_time):
 
     length = time_to_sec_fast(end_time) - time_to_sec_fast(start_time)
-    print length
-    fwd_bandr = [0 for i in range(length)]
-    fwd_bandw = [0 for i in range(length)]
+    fwd_bandr = [0 for i in range(length+5)]
+    fwd_bandw = [0 for i in range(length+5)]
 
     bandr, bandw = ost_deal_message(ost_message, ost_time, start_time, end_time)
+
     for j in range(length):
         for i in range(440):
-            if(bandr[i][j] > 0 or bandw[i][j] > 0):
-                print 'bandr[%d][%d]: %f bandw[%d][%d]: %f\n'\
-                %(i, j, bandr[i][j], i, j, bandw[i][j])
+#            if(bandr[i][j] > 0 or bandw[i][j] > 0):
+#                print 'bandr[%d][%d]: %f bandw[%d][%d]: %f\n'\
+#                %(i, j, bandr[i][j], i, j, bandw[i][j])
             fwd_bandr[j] += bandr[i][j]        
             fwd_bandw[j] += bandw[i][j]
 

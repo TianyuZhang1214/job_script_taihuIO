@@ -148,36 +148,20 @@ def read_CNC_runtime_corehour():
 
 def read_corehour():
 
-    jobID = []
-    core = []
+    corehour = dict()
 
     reader = csv.reader(open(file_name, 'rU'), dialect=csv.excel_tab)
     for line in reader:
         if(len(line) >= 16):
             if(int((line[7].split('-'))[0]) >= 2017 and \
             int((line[7].split('-'))[1]) >= 4):
-                if(line[0].strip()):
-                    jobID.append(line[0].strip())
-                if(line[4].strip()):
-                    compute_node_count.append(int(line[4].strip()))
-                if(line[10].strip()):
-                    run_time.append(float(line[10].strip()))
-                if(line[10].strip()):
-                    corehour.append(float(line[6].strip()))
+                corehour[line[0].strip()] = float(line[6].strip())
+#                if(line[0].strip()):
+#                    jobID.append(line[0].strip())
+#                if(line[10].strip()):
+#                    corehour.append(float(line[6].strip()))
     
-    return jobID, compute_node_count, run_time, corehour 
-
-
-
-
-
-
-
-
-
-
-
-
+    return corehour 
 
 def read_CNlist():
 
