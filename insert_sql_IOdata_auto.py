@@ -6,7 +6,6 @@ import exceptions
 import time
 import multiprocessing
 import gc
-
 sys.path.append("../query_script")
 from job_ip_all import get_re_jobid_CNC_runtime_corehour as get_re_jobid
 from showjob_by_jobid import compute_pre_with_jobid
@@ -16,10 +15,10 @@ from deal_generator import deal_all_message
 #Last JOBID queried before: 40645719
 #40786081
 #40880389
-startjobid = 40645719
-jobid_interval = 10000
-thread_count=1
+startid = '42500000'
+thread_count = 2
 size_ip = 50
+table = 'JOB_log'
 
 abnormal_job_file = "../../results_job_data/collect_data/insert_data/abnormal_insert_job.csv"
 job_file = "../../results_job_data/collect_data/insert_data/insert_job_completed.csv"
@@ -33,11 +32,11 @@ def save_job(jobid, file_name):
 
 def compute_result(jobid):
     try:
-        time1, time2, iplist, min_time, max_time \
+        time1, time2, iplist, min_time, max_time, fwd_list\
         = compute_pre_with_jobid(jobid)
     except Exception as e:
         print e
-    
+
     if (time1[8:10] == time2[8:10]):
         index = [time1[0:4] + "." + time1[5:7] + "." + time1[8:10]]
     else:
@@ -73,7 +72,8 @@ def compute_result(jobid):
     
     try:
         resultr_band,resultw_band,resultr_iops,resultw_iops,resultr_open,\
-        resultw_close, resultr_size, resultw_size, dictr, dictw, file_count, file_open\
+        resultw_close, resultr_size, resultw_size, dictr, dictw, \
+        file_all_count, file_open, fd_info, fwd_file_map\
         = deal_all_message(results_message, results_host, min_time, max_time)
         del results_message
         del results_host
@@ -107,18 +107,18 @@ def compute_result(jobid):
     sum_MDS_o, sum_MDS_c, \
     count_MDS_o, count_MDS_c, count_MDS_oc, \
     average_MDS_o, average_MDS_c, \
-    max_PE_r , max_PE_w, file_count      
+    max_PE_r , max_PE_w, file_all_count      
 
 def exist_job(jobid):
     conn=MySQLdb.connect(host='20.0.2.201',user='root',db='JOB_IO',passwd='',port=3306) 
-    print "connect success----"
     cursor=conn.cursor()
 #    sql = "select COLUMN_NAME from information_schema.COLUMNS where table_name = 'JOB_IO_INFO'"
     sql = "select 1 from JOB_IO_INFO where JOBID = '"+ jobid +"' limit 1"
     cursor.execute(sql)
     result=cursor.fetchall()
     tag = len(result)
-    print tag
+    if tag == '0':
+        print jobid
     conn.commit()
     cursor.close()
     conn.close()
@@ -139,7 +139,9 @@ def insert(jobid, column):
     print "connect success-----------------"
     try:
         resu = get_re_jobid(jobid)
+        print resu
         for val in resu:
+            job_name = val[1]
             program_name = val[2]
             CNC = int(val[5])
         try:
@@ -154,7 +156,6 @@ def insert(jobid, column):
             average_MDS_o, average_MDS_c, \
             max_PE_r, max_PE_w, file_all_count= \
             compute_result(jobid)
-
             cursor=conn.cursor()
             sql="INSERT INTO JOB_IO_INFO( \
             "+column[0]+","+column[1]+","+ \
@@ -170,25 +171,26 @@ def insert(jobid, column):
             column[20]+","+column[21]+","+ \
             column[22]+","+column[23]+","+ \
             column[24]+","+column[25]+","+ \
-            column[26]+","+column[27] + ")"\
+            column[26]+","+column[27] + \
+            column[28] + ")"\
             +" values('%s','%s','%d','%f','%d','%f',\
             '%f','%d','%f','%d','%f','%d','%f','%f','%d','%f',\
             '%d','%d','%d','%d','%f','%d','%d','%f',\
-            '%d','%d','%d','%d')" \
+            '%d','%d','%d','%d','%s')" \
             %(jobid, program_name, CNC, sum_IOBW_r, count_IOBW_r, average_IOBW_r, \
             sum_IOBW_w, count_IOBW_w, average_IOBW_w, count_IOBW_rw, \
             sum_IOPS_r, count_IOPS_r, average_IOPS_r, \
             sum_IOPS_w, count_IOPS_w, average_IOPS_w, count_IOPS_rw, count_IOPS_rw_all, \
             sum_MDS_o, count_MDS_o, average_MDS_o, \
             sum_MDS_c, count_MDS_c, average_MDS_c, count_MDS_oc, \
-            max_PE_r, max_PE_w, file_all_count)
+            max_PE_r, max_PE_w, file_all_count, JOB_NAME)
             cursor.execute(sql)
             conn.commit()
             cursor.close()
             save_job(jobid, job_file)
         except Exception as e:
-            save_job(jobid, abnormal_job_file )
             print e
+            save_job(jobid, abnormal_job_file )
             conn.rollback()
     except Exception as e:
         print e
@@ -208,28 +210,28 @@ def get_column_name():
     conn.close()
     return column
 
-def get_largest_jobid():
+def get_largest_jobid(table):
     conn=MySQLdb.connect(host='20.0.2.15',user='swqh',db='JOB',passwd='123456',port=3306) 
     cursor=conn.cursor()
-    sql = "select max(JOBID) from JOB_log"
+    sql = "select max(JOBID) from %s"%table
     cursor.execute(sql)
     result=cursor.fetchall()
     max_jobid = 0
     for re in result:
-        max_jobid = int(str(re)[2:-3])
+        max_jobid = str(re)[2:-3]
     cursor.close()
     conn.close()
     return max_jobid
 
 
-def get_jobid_larger_32(startid, endid):
+def get_jobid_larger_32(startid, endid, table):
     conn=MySQLdb.connect(host='20.0.2.15',user='swqh',db='JOB',passwd='123456',port=3306) 
     cursor=conn.cursor()
-    sql = "select JOBID from JOB_log where \
+    sql = "select JOBID from %s where \
     state = 'Done' and \
-    convert(JOBID,UNSIGNED) >= %d and \
-    convert(JOBID,UNSIGNED) < %d and CNC >= 32"\
-    %(startid, endid)
+    convert(JOBID,UNSIGNED) >= %s and \
+    convert(JOBID,UNSIGNED) < %s and CNC >= 32 order by JOBID"\
+    %(table, startid, endid)
     cursor.execute(sql)
     result=cursor.fetchall()
     jobid = []
@@ -242,31 +244,23 @@ def get_jobid_larger_32(startid, endid):
     return jobid
 
 def insert_main(column):
-    tag = 1
-    startid = startjobid 
-    while(tag):
-        max_jobid = get_largest_jobid()
-        while(startid < max_jobid):
-            jobid_read = get_jobid_larger_32(startid, startid+jobid_interval)
-            jobid = get_nonexistent_job(jobid_read)
-            for i in range(len(jobid)):
-                save_job(jobid[i], job_file_all)
-            p = multiprocessing.Pool(thread_count)
-            for i in range(len(jobid)):
-                 try:
-                     p.apply_async(insert, args=(jobid[i], column))
-                 except Exception as e:
-                     print 'jobid: %s failed.'%(jobid[i])
-                     print e
-            print 'jobid in range(%s, %s) completed.'%(startid, startid+jobid_interval)
-            p.close()
-            p.join()
-            startid += jobid_interval
-        time.sleep(600)
+    max_jobid = get_largest_jobid(table)
+    jobid_read = get_jobid_larger_32(startid, max_jobid, table)
+    jobid = get_nonexistent_job(jobid_read)
+#    for i in range(len(jobid)):
+#        save_job(jobid[i], job_file_all)
+    p = multiprocessing.Pool(thread_count)
+    for i in range(len(jobid)):
+         try:
+             p.apply_async(insert, args=(jobid[i], column))
+         except Exception as e:
+             print e
+             print 'jobid: %s failed.'%(jobid[i])
+    p.close()
+    p.join()
 
 def test_sql():
     conn=MySQLdb.connect(host='20.0.2.201',user='root',db='JOB_IO',passwd='',port=3306) 
-    print "connect success----"
     cursor=conn.cursor()
 #    sql = "select COLUMN_NAME from information_schema.COLUMNS where table_name = 'JOB_IO_INFO'"
     sql = "select 1 from JOB_IO_INFO where JOBID = '41027' limit 1"

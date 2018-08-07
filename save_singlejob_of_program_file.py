@@ -211,11 +211,6 @@ if __name__ == "__main__":
         print "Please input start mode (start or continue)!!!!!!!!!!!"
  
 
-    print len(program_name) 
-    print len(jobID) 
-    print len(start_time) 
-    print len(end_time)
-    print len(corehour)
     print thread_count
 
     p = multiprocessing.Pool(thread_count)

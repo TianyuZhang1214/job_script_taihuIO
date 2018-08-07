@@ -1,6 +1,6 @@
-jobid_file = '../../source_job_data/jobid_corehour_100k_1000k.csv'
+jobid_file = '../../source_job_data/jobid_corehour_1000k.csv'
 volume_file = '../../results_job_data/collect_data/all_data/IOBW.csv'
-save_volume_file = '../../results_job_data/volume/jobid_corehour_100k_1000k.csv'
+save_volume_file = '../../results_job_data/volume/jobid_corehour_1000k.csv'
 
 def read_jobid():
     f = open(jobid_file, 'r')
@@ -40,7 +40,3 @@ if __name__ == "__main__":
     jobid = read_jobid()
     volume_r, volume_w = read_volume()
     save_volume(jobid, volume_r, volume_w)
-
-
-
-

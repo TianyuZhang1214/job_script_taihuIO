@@ -40,6 +40,11 @@ fwd_map_2 = [81, 82, 105, 85, 87, 88, 89, 90, 93, 136, 97, 99, 101, 103, 91, 92,
 127, 141, 142, 143, 144, 107, 108, 109, 110, 111, 112, 113, 55, 121, 116, 117, 118, \
 119, 120, 122, 94, 124, 125, 138, 139, 23, 24, 25, 26, 27, 28, 29, 44, 31, 45, 33, 34, \
 35, 36, 37, 38, 39, 40, 41, 42, 126, 20, 43]
+
+s_time = 'NULL'
+e_time = 'NULL'
+
+
 parser = OptionParser()
 
 parser.add_option("-t", "--trace", default = False, action = "store_true", \
@@ -96,15 +101,20 @@ def read_csv(read_file):
     return read_results
 
 def compute_pre_with_jobid(jobid):
-    #    print time11, time12, jobid
     UTC=datetime.timedelta(hours=8) 
-    resu=[]
-    resu=get_re_jobid_all(jobid)
+    resu = []
+    resu = get_re_jobid_all(jobid)
     print resu
     for val in resu:
         ti=val[0]+" "+val[1]+" "+val[2]
         time21=val[3]
         time22=val[4]
+
+        if s_time != 'NULL':
+            time21 = s_time
+        if e_time != 'NULL':
+            time22 = e_time
+
         node=val[8]
         iplist=[]
         fwd_list = dict()
@@ -130,7 +140,6 @@ def compute_pre_with_jobid(jobid):
                         fwd_list[fwd_no].add(ip)
                     else:
                         fwd_list[fwd_no] = set([ip])
-
             elif len(a)==1:
                     #print a[0]
                 w2=int(a[0])//1024
@@ -144,14 +153,21 @@ def compute_pre_with_jobid(jobid):
                     fwd_list[fwd_no].add(ip)
                 else:
                     fwd_list[fwd_no] = set([ip])
-        t21=datetime.datetime.strptime(time21,'%Y-%m-%d %H:%M:%S') 
-        t22=datetime.datetime.strptime(time22,'%Y-%m-%d %H:%M:%S') 
-        min_time=time_to_sec_fast(time21)
-        max_time=time_to_sec_fast(time22)
-        tt1=str(t21-UTC)
-        tt2=str(t22-UTC)
-        time1=tt1[:10]+"T"+tt1[11:]+".000Z"
-        time2=tt2[:10]+"T"+tt2[11:]+".000Z"
+        try:
+            t21 = datetime.datetime.strptime(time21,'%Y-%m-%d %H:%M:%S') 
+            t22 = datetime.datetime.strptime(time22,'%Y-%m-%d %H:%M:%S')
+        except Exception as e:
+            print e
+            print 'Time format is incorrect. \
+            Job information is not updated in job database.'
+            sys.exit()
+
+        min_time = time_to_sec_fast(time21)
+        max_time = time_to_sec_fast(time22)
+        tt1 = str(t21-UTC)
+        tt2 = str(t22-UTC)
+        time1 = tt1[:10]+"T"+tt1[11:]+".000Z"
+        time2 = tt2[:10]+"T"+tt2[11:]+".000Z"
 
     return time1, time2, iplist, min_time, max_time, fwd_list
 
@@ -161,11 +177,14 @@ def show_job_all(jobid):
         = compute_pre_with_jobid(jobid)
     except Exception as e:
         print e
-
-    print time1    
-    print time2    
-    print min_time    
-    print max_time
+    try:
+        print time1    
+        print time2    
+        print min_time    
+        print max_time
+    except Exception as e:
+        print 'Start_time or end_time are not updated.Please wait for job complete or give explicit time format'
+        sys.exit()
 
     if (time1[8:10] == time2[8:10]):
         index = [time1[0:4] + "." + time1[5:7] + "." + time1[8:10]]
@@ -348,12 +367,15 @@ def show_job_all(jobid):
                 print e
 
 if __name__=="__main__":
-    if (len(sys.argv)<1):
+    if (len(sys.argv) < 2):
         print "please input jobid e.g:6100000"
         sys.exit()
     start_time0 = clock()
     jobid=sys.argv[1]
-#    test_save_main(time11, time12, jobid)
-    
+
+    if (len(sys.argv) >= 6):
+        s_time = sys.argv[2] + ' ' + sys.argv[3]
+        e_time = sys.argv[4] + ' ' + sys.argv[5]
+
     print jobid
     show_job_all(jobid)

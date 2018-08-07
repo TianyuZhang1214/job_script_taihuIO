@@ -7,6 +7,7 @@ import json
 #import matplotlib.patches as patches
 import numpy as np
 import sys
+import MySQLdb
 sys.path.insert(0,"../../job")
 sys.path.append("../query_script")
 from job_ip_all import get_re_jobid_CNC_runtime_corehour as get_re_jobid
@@ -26,23 +27,6 @@ node_count = 50
 IOBW_affective = 0.1
 
 length = 5000
-#conn=ES('20.0.8.20::9200')
-
-def draw_2d(x, y):
-
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    plt.plot(x, 'r.')
-    plt.plot(y, 'g.')
-    #plt.plot([0, 35], [average, average], 'r-')
-    #plt.xlabel('Runtime (day)', fontsize = 20)
-    #plt.ylabel('IO_Time/Runtime ', fontsize = 20)
-    plt.xlabel('index', fontsize = 20)
-    #plt.ylabel('IOPS ', fontsize = 20)
-    plt.ylabel('', fontsize = 20)
-    label = ["read", "write"]
-    plt.legend(label, loc = 1, ncol = 1)
-    plt.show()
 
 def save_all(jobID, resultr_band, resultw_band, resultr_iops, resultw_iops, resultr_open, resultw_close, pe_r, pe_w, file_open, title):
     f=file('../../results_job_data/collect_data/'+ title+'/all.csv','ab')
@@ -63,6 +47,33 @@ def save_all(jobID, resultr_band, resultw_band, resultr_iops, resultw_iops, resu
             f.write(write_row)
         else:
             continue
+
+def insert(column, table_name, jobID, CNC, run_time, corehour, IO_mode, \
+    IO_volumn, time_start, time_end, time):
+    conn = MySQLdb.connect(host='20.0.2.201',user='root',db='JOB_IO',passwd='',port=3306) 
+    print "connect success-----------------"
+    try:
+        cursor=conn.cursor()
+        try:
+            for i in range(len(IO_mode)):
+                sql="INSERT INTO "+ table_name + "( \
+                "+column[0]+","+column[1]+","+ \
+                column[2]+","+column[3]+","+ \
+                column[4]+","+column[5]+","+ \
+                column[6]+","+column[7]+","+ \
+                column[8] + ")"\
+                +" values('%s','%d','%d','%f','%s','%f','%d','%d','%d')"\
+                %(jobID , CNC , run_time , corehour , IO_mode[i] , \
+                IO_volumn[i] , time_start[i] , time_end[i] , time[i] )
+                cursor.execute(sql)
+                conn.commit()
+        except Exception as e:
+            print e
+            conn.rollback()
+        cursor.close()
+    except Exception as e:
+        print e
+    conn.close()
 
 def compute_month_day(month):
     if(month == 1 or month == 3 or month == 5 or month == 7 or month == 8 or\
@@ -207,7 +218,7 @@ time_start, time_end, time, file_name):
         time_start[i], time_end[i], time[i])
         f.write(write_row)
 
-def save_IOphase_mode(jobID, CNC ,run_time, corehour, resultr_band, resultw_band, \
+def save_IOphase_mode(column, jobID, CNC ,run_time, corehour, resultr_band, resultw_band, \
 resultr_iops, resultw_iops, resultr_open, resultw_close, resultr_size, resultw_size, \
 pe_r, pe_w, file_all_count, title):
     
@@ -224,7 +235,13 @@ pe_r, pe_w, file_all_count, title):
     save_IO(jobID, CNC ,run_time, corehour, IO_mode_w, IO_volumn_w, \
     time_w_start, time_w_end, time_w, file_name_w)
 
-def save_main(jobid, title):
+    insert(column, 'JOB_IOMODE_READ', jobID, CNC, run_time, corehour, IO_mode_r, \
+    IO_volumn_r, time_r_start, time_r_end, time_r)
+
+    insert(column, 'JOB_IOMODE_WRITE', jobID, CNC, run_time, corehour, IO_mode_w, \
+    IO_volumn_w, time_w_start, time_w_end, time_w)
+
+def save_main(jobid, title, column):
 #    print jobid
     try:
         jobID, CNC ,run_time, corehour, time1, time2, \
@@ -270,7 +287,8 @@ def save_main(jobid, title):
 
     try:
         resultr_band,resultw_band,resultr_iops,resultw_iops,resultr_open, resultw_close, \
-        resultr_size, resultw_size, dictr, dictw, file_all_count, file_open \
+        resultr_size, resultw_size, dictr, dictw, file_all_count, file_open, \
+        fd_info, fwd_file_map \
         = deal_all_message(results_message, results_host, min_time, max_time)
         del results_message
         del results_host
@@ -288,7 +306,7 @@ def save_main(jobid, title):
     save_all(jobID, resultr_band, resultw_band, \
     resultr_iops, resultw_iops, resultr_open, resultw_close, pe_r, pe_w, file_open, title)
     
-    save_IOphase_mode(jobID, CNC ,run_time, corehour, resultr_band, resultw_band, \
+    save_IOphase_mode(column, jobID, CNC ,run_time, corehour, resultr_band, resultw_band, \
     resultr_iops, resultw_iops, resultr_open, resultw_close, resultr_size, resultw_size, \
     pe_r, pe_w, file_all_count, title)
 
