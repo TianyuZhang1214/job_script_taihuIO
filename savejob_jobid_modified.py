@@ -5,7 +5,7 @@
 # Embedded file name: /home/export/mount_test/swstorage/taihu-io/job_query_script/savejob_jobid_modified.py
 # Compiled at: 2018-03-15 18:49:42
 import json, numpy as np, sys
-sys.path.insert(0, '../../job')
+sys.path.insert(0, '/home/export/mount_test/swstorage/job')
 sys.path.append('../query_script')
 from job_ip_all import get_re_jobid
 from time_to_sec import time_to_sec_fast
@@ -356,7 +356,7 @@ def saveIOBANDWIDTH(resultr, resultw, title, jobid, program_name, corehour, min_
         resultr[i] = resultr[i]
         resultw[i] = resultw[i]
 
-    csvfile = file('../../results_job_data/collect_data/' + title + '/IOBW.csv', 'ab')
+    csvfile = file('/home/export/mount_test/swstorage/results_job_data/collect_data/' + title + '/IOBW.csv', 'ab')
     writer = csv.writer(csvfile)
     date = []
     allr = 0.0
@@ -392,7 +392,7 @@ def saveIOPS(resultr, resultw, title, jobid, program_name, corehour, min_time):
 
 
 def saveMDS(resultr, resultw, title, jobid, program_name, corehour, min_time):
-    csvfile = file('../../results_job_data/collect_data/' + title + '/MDS.csv', 'ab')
+    csvfile = file('/home/export/mount_test/swstorage/results_job_data/collect_data/' + title + '/MDS.csv', 'ab')
     writer = csv.writer(csvfile)
     date = []
     writer.writerow(['program_name and jobID ', str(program_name), str(jobid),
@@ -408,7 +408,7 @@ def saveMDS(resultr, resultw, title, jobid, program_name, corehour, min_time):
 
 
 def savefilename(file_set_open, title, jobid, program_name, corehour, min_time):
-    csvfile = file('../../results_job_data/collect_data/' + title + '/file_name.csv', 'ab')
+    csvfile = file('/home/export/mount_test/swstorage/results_job_data/collect_data/' + title + '/file_name.csv', 'ab')
     writer = csv.writer(csvfile)
     data = []
     writer.writerow(['program_name and jobID ', str(program_name), str(jobid),
@@ -444,11 +444,11 @@ def savesize(result, ope, title, jobid, program_name):
     dica = sorted(dic.iteritems(), key=lambda d: d[1], reverse=True)
     dd = dict()
     if co == 'r':
-        csvfile = file('../../results_job_data/collect_data/' + title + '/SIZE_r.csv', 'ab')
+        csvfile = file('/home/export/mount_test/swstorage/results_job_data/collect_data/' + title + '/SIZE_r.csv', 'ab')
         writer = csv.writer(csvfile)
     else:
         if co == 'b':
-            csvfile = file('../../results_job_data/collect_data/' + title + '/SIZE_w.csv', 'ab')
+            csvfile = file('/home/export/mount_test/swstorage/results_job_data/collect_data/' + title + '/SIZE_w.csv', 'ab')
             writer = csv.writer(csvfile)
     for i in range(len(dica)):
         if i < 10:
@@ -479,7 +479,7 @@ def saveprocess(dic, pa, title, min_time, max_time, jobid, program_name, corehou
             re[key[1]] += 1
 
     if pa == 'r':
-        csvfile = file('../../results_job_data/collect_data/' + title + '/PER.csv', 'ab')
+        csvfile = file('/home/export/mount_test/swstorage/results_job_data/collect_data/' + title + '/PER.csv', 'ab')
         writer = csv.writer(csvfile)
         writer.writerow(['program_name and jobID ', str(program_name), str(jobid),
          str(corehour), str(min_time)])
@@ -492,7 +492,7 @@ def saveprocess(dic, pa, title, min_time, max_time, jobid, program_name, corehou
         csvfile.close()
     else:
         if pa == 'b':
-            csvfile = file('../../results_job_data/collect_data/' + title + '/PEW.csv', 'ab')
+            csvfile = file('/home/export/mount_test/swstorage/results_job_data/collect_data/' + title + '/PEW.csv', 'ab')
             writer = csv.writer(csvfile)
             writer.writerow(['program_name and jobID ', str(program_name), str(jobid),
              str(corehour), str(min_time)])

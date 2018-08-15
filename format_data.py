@@ -5,11 +5,11 @@ from read_from_source import read_runtime, read_CNC, read_big_job, read_CNC_runt
 import scipy.io as sio  
 import matplotlib.pyplot as plt
 
-IOBW_file_name = '../../results_job_data/collect_data/all_data/IOBW.csv'
-IOPS_file_name = '../../results_job_data/collect_data/all_data/IOPS.csv'
-MDS_file_name = '../../results_job_data/collect_data/all_data/MDS.csv'
+IOBW_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/IOBW.csv'
+IOPS_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/IOPS.csv'
+MDS_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/MDS.csv'
 
-IOPS_BW_MDS_file_name = '../../results_job_data/collect_data/format_data/IOPS_BW_MDS_file.csv'
+IOPS_BW_MDS_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/format_data/IOPS_BW_MDS_file.csv'
 
 def draw_2d(x, y):
 

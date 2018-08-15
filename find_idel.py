@@ -1,5 +1,5 @@
-file1 = "../../results/fn_result_all/fn-usage-high-2017-11-25.csv"
-file2 = "../../results/fn_result_all/fn-usage-idel-2017-11-25.csv"
+file1 = "/home/export/mount_test/swstorage/results/fn_result_all/fn-usage-high-2017-11-25.csv"
+file2 = "/home/export/mount_test/swstorage/results/fn_result_all/fn-usage-idel-2017-11-25.csv"
 
 def read_mnt():
     mnt = []

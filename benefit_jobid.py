@@ -1,5 +1,7 @@
 import csv
 from read_from_source import read_job_core
+from read_IOmode_DB import get_job_bene_info, get_corehour_jobnum
+
 
 job_info_name = '/home/export/mount_test/swstorage/source_job_data/JOB_log.csv'
 IOBW_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/IOBW.csv'
@@ -28,7 +30,7 @@ corehour_interval4 = 10000
 corehour_interval5 = 100000
 
 high_mds = 1000
-total_job_num = 68742.0
+total_job_num, total_corehour = get_corehour_jobnum()
 #IO_mode dict() : IO_mode[jobid] = { 'mds': ;'avg_mds' = ;'io_time': ;'pe_r': ;'pe_w': ;'mode': ;
 #'core': ;}
 
@@ -142,15 +144,16 @@ def aggregate_R_W(IO_mode_r, IO_mode_w):
         if(not IO_mode_r.has_key(job)):
             IO_mode_r[job] = {}
             IO_mode_r[job]['mode'] = IO_mode_w[job]['mode']
-
 #            IO_mode_r[job]['mds'] = IO_mode_w[job]['mds']
-#            IO_mode_r[job]['avg_mds'] = IO_mode_w[job]['avg_mds']
-#            IO_mode_r[job]['io_time'] = IO_mode_w[job]['io_time']
-#            IO_mode_r[job]['pe_r'] = IO_mode_w[job]['pe_r']
-#            IO_mode_r[job]['pe_w'] = IO_mode_w[job]['pe_w']
-#            IO_mode_r[job]['mode'] = IO_mode_w[job]['mode']
+            IO_mode_r[job]['avg_mds'] = IO_mode_w[job]['avg_mds']
+            IO_mode_r[job]['io_time'] = IO_mode_w[job]['io_time']
+            IO_mode_r[job]['pe_r'] = IO_mode_w[job]['pe_r']
+            IO_mode_r[job]['pe_w'] = IO_mode_w[job]['pe_w']
+            IO_mode_r[job]['mode'] = IO_mode_w[job]['mode']
+            IO_mode_r[job]['corehour'] = IO_mode_w[job]['corehour']
 #            IO_mode_r[job]['core'] = IO_mode_w[job]['core']
              
+            
             
 def judge_benefit_job(IO_mode):
 
@@ -159,6 +162,7 @@ def judge_benefit_job(IO_mode):
     job_pe_less32 = set()
     job_mds_more1k = set()
     job_all_set = set()
+
     for job in IO_mode:
         job_all_set.add(job)
         try:
@@ -166,56 +170,60 @@ def judge_benefit_job(IO_mode):
             IO_mode[job]['io_time'] >= 120 and IO_mode[job]['avg_mds'] <= high_mds and \
             (IO_mode[job]['pe_r'] >= 32 or IO_mode[job]['pe_w'] >= 32)):
                 job_benefit.add(job)
-            if(IO_mode[job]['io_time'] < 120):
-                job_time_less120.add(job)
-            if((IO_mode[job]['pe_r'] < 32 and IO_mode[job]['pe_w'] < 32) or \
+            elif((IO_mode[job]['pe_r'] < 32 and IO_mode[job]['pe_w'] < 32) or \
             IO_mode[job]['mode'] == '1to1'):
                 job_pe_less32.add(job)
-            if(IO_mode[job]['avg_mds'] > high_mds):
+            elif(IO_mode[job]['avg_mds'] > high_mds and IO_mode[job]['io_time'] >= 120):
                 job_mds_more1k.add(job)
-#            if(IO_mode[job]['mode'] == '1to1' and IO_mode[job]['cnc'] >= 8000):
-#                print job
+            else:
+                job_time_less120.add(job)
         except Exception as e:
-#            print e
+            print e
             continue
-    job_set1 = job_time_less120&job_pe_less32
-    job_set2 = job_time_less120&job_mds_more1k
-    job_set3 = job_pe_less32&job_mds_more1k
 
-    job_mix = job_set1|job_set2|job_set3
-    job_single_time = job_time_less120 - (job_set1|job_set2)
-    job_single_pe = job_pe_less32 - (job_set1|job_set3)
-    job_single_mds = job_mds_more1k - (job_set2|job_set3)
-   
-    job_unknow = job_all_set - (job_benefit|job_time_less120|job_pe_less32|job_mds_more1k)
-    
-#    for job in job_unknow:
-#        print job, IO_mode[job]
+    print len(set(IO_mode.keys())) 
+    job_unknow = set(IO_mode.keys()) - job_benefit - job_time_less120 - \
+    job_pe_less32 - job_mds_more1k
+
     ch_bene = 0
-    ch_32 = 0
-    ch_mds = 0
+    ch_32   = 0
+    ch_mds  = 0
+    ch_time = 0
 
     for job in job_benefit:
-        print job
         ch_bene += IO_mode[job]['corehour']
         
-    for job in job_single_pe:
+    for job in job_pe_less32:
         ch_32 += IO_mode[job]['corehour']
         
-    for job in job_single_mds:
+    for job in job_mds_more1k:
         ch_mds += IO_mode[job]['corehour']
 
-    single_job = len(job_single_time) + len(job_mix) + total_job_num - len(IO_mode)
+    for job in job_time_less120:
+        ch_time += IO_mode[job]['corehour']
+   
+
+    print "%d %f"%(len(job_benefit)      , ch_bene)
+    print "%d %f"%(len(job_pe_less32)    , ch_32  )
+    print "%d %f"%(len(job_mds_more1k)   , ch_mds )
+    print "%d %f"%(len(job_time_less120) , ch_time)
+
+
     print "Total number of job: %d .\n"%(len(IO_mode))
-    print "Job number of benefit: %d percentage: %f corehour: %f.\n"%((len(job_benefit)), \
-    (float((len(job_benefit))/total_job_num)), ch_bene)
-    print "Job number of process-num less than 32 : %d percentage: %f corehour: %f.\n"%(len(job_single_pe), \
-    len(job_single_pe)/total_job_num, ch_32)
-    print "Job number of IO_time less than 120s : %d percentage: %f .\n"%(single_job, \
-    single_job/total_job_num)
-    print "Job number of mds more than 1K : %d percentage: %f corehour: %f.\n"%(len(job_single_mds), \
-    len(job_single_mds)/total_job_num, ch_mds)
-    print "Job number of mix : %d percentage: %f .\n"%(len(job_mix), len(job_mix)/total_job_num)
+    
+    print "Job number of benefit: %d percentage: %f corehour: %f percentage: %f.\n"\
+    %((len(job_benefit)), (float((len(job_benefit))/total_job_num)), \
+    ch_bene, ch_bene/ total_corehour)
+
+    print "Job number of process-num less than 32 : %d percentage: %f corehour: %f percentage: %f.\n"\
+    %(len(job_pe_less32), len(job_pe_less32)/total_job_num, ch_32, ch_32/ total_corehour)
+    
+    print "Job number of IO_time less than 120s : %d percentage: %f corehour: %f percentage: %f.\n"\
+    %(len(job_time_less120), len(job_time_less120)/total_job_num, \
+    ch_time, ch_time/ total_corehour)
+    
+    print "Job number of mds more than 1K : %d percentage: %f corehour: %f percentage: %f.\n"%(len(job_mds_more1k), \
+    len(job_mds_more1k)/total_job_num, ch_mds, ch_mds/ total_corehour)
 
 def group(IO_mode):
     NtoN_32 = 0
@@ -323,7 +331,6 @@ def group_corehour(IO_mode):
 
     for job in IO_mode:
         if (IO_mode[job]['mode'] == 'NtoN'):
-            print job
             if(IO_mode[job]['corehour'] >= corehour_interval0 and \
             IO_mode[job]['corehour'] < corehour_interval1):
                 NtoN_0 += 1
@@ -342,7 +349,6 @@ def group_corehour(IO_mode):
             elif(IO_mode[job]['corehour'] >= corehour_interval5):
                 NtoN_5 += 1
         elif (IO_mode[job]['mode'] == 'Nto1'):
-            print job
             if(IO_mode[job]['corehour'] >= corehour_interval0 and \
             IO_mode[job]['corehour'] < corehour_interval1):
                 Nto1_0 += 1
@@ -379,32 +385,35 @@ def group_corehour(IO_mode):
             elif(IO_mode[job]['corehour'] >= corehour_interval5):
                 oneto1_5 += 1
 
-#    print "NtoN: range[0, 10): %d."%(NtoN_0)
-#    print "NtoN: range[10, 100): %d."%(NtoN_1)
-#    print "NtoN: range[100, 1000): %d."%(NtoN_2)
-#    print "NtoN: range[1000, 10000): %d."%(NtoN_3)
-#    print "NtoN: range[10000, 100000): %d."%(NtoN_4)
-#    print "NtoN: range[100000, inf): %d."%(NtoN_5)
-#
-#    print "Nto1: range[0, 10): %d."%(Nto1_0)
-#    print "Nto1: range[10, 100): %d."%(Nto1_1)
-#    print "Nto1: range[100, 1000): %d."%(Nto1_2)
-#    print "Nto1: range[1000, 10000): %d."%(Nto1_3)
-#    print "Nto1: range[10000, 100000): %d."%(Nto1_4)
-#    print "Nto1: range[100000, inf): %d."%(Nto1_5)
-#
-#    print "oneto1: range[0, 10): %d."%(oneto1_0)
-#    print "oneto1: range[10, 100): %d."%(oneto1_1)
-#    print "oneto1: range[100, 1000): %d."%(oneto1_2)
-#    print "oneto1: range[1000, 10000): %d."%(oneto1_3)
-#    print "oneto1: range[10000, 100000): %d."%(oneto1_4)
-#    print "oneto1: range[100000, inf): %d."%(oneto1_5)
+    print "NtoN: range[0, 10): %d."%(NtoN_0)
+    print "NtoN: range[10, 100): %d."%(NtoN_1)
+    print "NtoN: range[100, 1000): %d."%(NtoN_2)
+    print "NtoN: range[1000, 10000): %d."%(NtoN_3)
+    print "NtoN: range[10000, 100000): %d."%(NtoN_4)
+    print "NtoN: range[100000, inf): %d."%(NtoN_5)
+
+    print "Nto1: range[0, 10): %d."%(Nto1_0)
+    print "Nto1: range[10, 100): %d."%(Nto1_1)
+    print "Nto1: range[100, 1000): %d."%(Nto1_2)
+    print "Nto1: range[1000, 10000): %d."%(Nto1_3)
+    print "Nto1: range[10000, 100000): %d."%(Nto1_4)
+    print "Nto1: range[100000, inf): %d."%(Nto1_5)
+
+    print "oneto1: range[0, 10): %d."%(oneto1_0)
+    print "oneto1: range[10, 100): %d."%(oneto1_1)
+    print "oneto1: range[100, 1000): %d."%(oneto1_2)
+    print "oneto1: range[1000, 10000): %d."%(oneto1_3)
+    print "oneto1: range[10000, 100000): %d."%(oneto1_4)
+    print "oneto1: range[100000, inf): %d."%(oneto1_5)
 
 def benefit_main():        
-    IO_mode_r = read_IOmode(IO_mode_file_r)
-    IO_mode_w = read_IOmode(IO_mode_file_w)
-    
+#    IO_mode_r = read_IOmode(IO_mode_file_r)
+#    IO_mode_w = read_IOmode(IO_mode_file_w)
+    IO_mode_r = get_job_bene_info('read')
+    IO_mode_w = get_job_bene_info('write')
     aggregate_R_W(IO_mode_r, IO_mode_w)
+#    for job in IO_mode_r:
+#        print IO_mode_r[job]['mode']
 #    read_PE(IO_mode_r)
 #    read_core(IO_mode_r)
 #    read_MDS(IO_mode_r)
@@ -413,17 +422,18 @@ def benefit_main():
         
 
 def main_IOmode_corehour():        
-    IO_mode_r = read_IOmode(IO_mode_file_r)
-    IO_mode_w = read_IOmode(IO_mode_file_w)
-        
-    read_PE(IO_mode_r)
-    read_PE(IO_mode_w)
-    read_core(IO_mode_r)
-    read_core(IO_mode_w)
-    read_MDS(IO_mode_r)
-    read_MDS(IO_mode_w)
-    read_IO_time(IO_mode_r)
-    read_IO_time(IO_mode_w)
+#    IO_mode_r = read_IOmode(IO_mode_file_r)
+#    IO_mode_w = read_IOmode(IO_mode_file_w)
+#    read_PE(IO_mode_r)
+#    read_PE(IO_mode_w)
+#    read_core(IO_mode_r)
+#    read_core(IO_mode_w)
+#    read_MDS(IO_mode_r)
+#    read_MDS(IO_mode_w)
+#    read_IO_time(IO_mode_r)
+#    read_IO_time(IO_mode_w)
+    IO_mode_r = get_job_bene_info('read')
+    IO_mode_w = get_job_bene_info('write')
     print "Read result:"
     group_corehour(IO_mode_r)
     print "Write result:"
@@ -431,5 +441,5 @@ def main_IOmode_corehour():
 
 if __name__ == "__main__":
 
-    benefit_main()
-#    main_IOmode_corehour()
+#    benefit_main()
+    main_IOmode_corehour()

@@ -27,11 +27,17 @@ def get_job_info(jobname, CNC):
     cursor=conn.cursor()
     sql = ''
     if(jobname == '' and CNC == 0):
-        sql = "select JOB_NAME, CNC, JOBID, IOBW_READ_AVERAGE, \
-        IOBW_WRITE_AVERAGE, IOPS_READ_AVERAGE, IOPS_WRITE_AVERAGE, \
+        sql = "select JOB_NAME, CNC, JOBID, IOTIME_COUNT, \
+        IOBW_READ_SUM + IOBW_WRITE_SUM, IOPS_READ_AVERAGE, \
+        IOPS_WRITE_AVERAGE, \
         IOTIME_COUNT, MDS_OPEN_AVERAGE, PROCESS_READ_MAX, \
         PROCESS_WRITE_MAX, FILENAME_UNIQUE_COUNT \
         from JOB_IO_INFO"
+#        sql = "select JOB_NAME, CNC, JOBID, IOBW_READ_AVERAGE, \
+#        IOBW_WRITE_AVERAGE, IOPS_READ_AVERAGE, IOPS_WRITE_AVERAGE, \
+#        IOTIME_COUNT, MDS_OPEN_AVERAGE, PROCESS_READ_MAX, \
+#        PROCESS_WRITE_MAX, FILENAME_UNIQUE_COUNT \
+#        from JOB_IO_INFO"
     else: 
         sql = "select JOB_NAME, CNC, JOBID, IOBW_READ_AVERAGE, \
         IOBW_WRITE_AVERAGE, IOPS_READ_AVERAGE, IOPS_WRITE_AVERAGE, \
@@ -49,6 +55,15 @@ def get_job_info(jobname, CNC):
 
     return result
     
+
+    
+    
+    
+    
+    
+    
+    
+    
 def deal_jobinfo(result):
     job_info = dict()
     for res in result:
@@ -58,7 +73,7 @@ def deal_jobinfo(result):
         if(jobname not in job_info):
             job_info[jobname] = {}
         job_info[jobname][jobid] = {}
-        job_info[jobname][jobid]['iobw_r'] = float(array[3])
+        job_info[jobname][jobid]['iobw_r'] = float(array[3][:-1])
         job_info[jobname][jobid]['iobw_w'] = float(array[4])
         job_info[jobname][jobid]['iops_r'] = float(array[5])
         job_info[jobname][jobid]['iops_w'] = float(array[6])
@@ -101,14 +116,103 @@ def get_last_k_jobinfo(k, job_info):
         last_k_jobinfo[jobname]['pe_w']    = sum_pe_w   / length
 
     return last_k_jobinfo 
-    
-def get_avg_last_k_jobinfo(k, job_info):
+
+def get_last_all_jobinfo(job_info):
     last_k_jobinfo = dict()
     all_match = 0
+    all_match1 = 0
+    all_match2 = 0
     all_job = 0
     for jobname in job_info:
         jobid_list = sorted(job_info[jobname].keys())
         match = 0.0
+        match1 = 0.0
+        match2 = 0.0
+        if(len(jobid_list) == 1):
+            last_k_jobinfo[jobname] = {}
+            last_k_jobinfo[jobname]['match'] = 1.0
+            all_match += 1
+            continue
+        sum_iobw_r = 0
+        sum_iobw_w = 0
+        sum_pe_r   = 0
+        sum_pe_w   = 0
+        for i in range(1, len(jobid_list)):
+            length = i
+            sum_iobw_r += job_info[jobname][jobid_list[i-1]]['iobw_r']
+            sum_iobw_w += job_info[jobname][jobid_list[i-1]]['iobw_w']
+            sum_pe_r   += job_info[jobname][jobid_list[i-1]]['pe_r']
+            sum_pe_w   += job_info[jobname][jobid_list[i-1]]['pe_w']
+#            for j in range(0, i):
+#                sum_iobw_r += job_info[jobname][jobid_list[j]]['iobw_r']
+#                sum_iobw_w += job_info[jobname][jobid_list[j]]['iobw_w']
+#                sum_pe_r +=   job_info[jobname][jobid_list[j]]['pe_r']
+#                sum_pe_w +=   job_info[jobname][jobid_list[j]]['pe_w']
+            if(not last_k_jobinfo.has_key(jobname)):
+                last_k_jobinfo[jobname] = {}
+            last_k_jobinfo[jobname][i] = {}
+            last_k_jobinfo[jobname][i]['job_num'] = len(jobid_list)
+            if(sum_iobw_r > 0.0):
+                last_k_jobinfo[jobname][i]['iobw_r']     = \
+                abs(job_info[jobname][jobid_list[i]]['iobw_r'] \
+                /(sum_iobw_r / length) - 1)
+            else:
+                last_k_jobinfo[jobname][i]['iobw_r'] = MAX_VAL
+            if(sum_iobw_w > 0.0):
+                last_k_jobinfo[jobname][i]['iobw_w']     = \
+                abs(job_info[jobname][jobid_list[i]]['iobw_w'] \
+                /(sum_iobw_w / length) - 1)
+            else:
+                last_k_jobinfo[jobname][i]['iobw_w'] = MAX_VAL
+            if(sum_pe_r > 0.0):
+                last_k_jobinfo[jobname][i]['pe_r']       = \
+                abs(job_info[jobname][jobid_list[i]]['pe_r']/ \
+                (sum_pe_r / length) - 1)
+            else:
+                last_k_jobinfo[jobname][i]['pe_r'] = 0.0
+            if(sum_pe_w > 0.0):
+                last_k_jobinfo[jobname][i]['pe_w']       = \
+                abs(job_info[jobname][jobid_list[i]]['pe_w']/ \
+                (sum_pe_w / length) - 1)
+            else:
+                last_k_jobinfo[jobname][i]['pe_w'] = 0.0
+            if(last_k_jobinfo[jobname][i]['iobw_r'] < 0.2 and 
+            last_k_jobinfo[jobname][i]['iobw_w'] < 0.2 and 
+            last_k_jobinfo[jobname][i]['pe_r'] < 0.2 and 
+            last_k_jobinfo[jobname][i]['pe_w'] < 0.2):
+                match += 1.0
+            if(last_k_jobinfo[jobname][i]['iobw_r'] < 0.2):
+                match1 += 1.0
+            if(last_k_jobinfo[jobname][i]['iobw_w'] < 0.2):
+                match2 += 1.0
+        if(len(jobid_list) - 1 == 0): 
+            last_k_jobinfo[jobname]['match'] = 1.0
+        else:
+            last_k_jobinfo[jobname]['match'] = \
+            match / float(len(jobid_list) - 1)
+        all_match += match
+        all_match1 += match1
+        all_match2 += match2
+                
+        all_job += len(jobid_list)
+
+#    print "match: %f  all_jobid: %f"%(all_match, all_job) 
+    print "match1: %f  all_jobid: %f"%(all_match1, all_job) 
+    print "match2: %f  all_jobid: %f"%(all_match2, all_job) 
+            
+    return last_k_jobinfo 
+
+def get_avg_last_k_jobinfo(k, job_info):
+    last_k_jobinfo = dict()
+    all_match = 0
+    all_match1 = 0
+    all_match2 = 0
+    all_job = 0
+    for jobname in job_info:
+        jobid_list = sorted(job_info[jobname].keys())
+        match = 0.0
+        match1 = 0.0
+        match2 = 0.0
         if(len(jobid_list) >= k + 1):
             length = float(k)
             all_avg_length = float(len(jobid_list) - k)
@@ -128,40 +232,52 @@ def get_avg_last_k_jobinfo(k, job_info):
                 last_k_jobinfo[jobname][i]['job_num'] = len(jobid_list)
                 if(sum_iobw_r > 0.0):
                     last_k_jobinfo[jobname][i]['iobw_r']     = \
-                    abs(job_info[jobname][jobid_list[j]]['iobw_r'] \
+                    abs(job_info[jobname][jobid_list[i]]['iobw_r'] \
                     /(sum_iobw_r / length) - 1)
                 else:
                     last_k_jobinfo[jobname][i]['iobw_r'] = MAX_VAL
                 if(sum_iobw_w > 0.0):
                     last_k_jobinfo[jobname][i]['iobw_w']     = \
-                    abs(job_info[jobname][jobid_list[j]]['iobw_w'] \
+                    abs(job_info[jobname][jobid_list[i]]['iobw_w'] \
                     /(sum_iobw_w / length) - 1)
                 else:
                     last_k_jobinfo[jobname][i]['iobw_w'] = MAX_VAL
                 if(sum_pe_r > 0.0):
                     last_k_jobinfo[jobname][i]['pe_r']       = \
-                    abs(job_info[jobname][jobid_list[j]]['pe_r']/ \
+                    abs(job_info[jobname][jobid_list[i]]['pe_r']/ \
                     (sum_pe_r / length) - 1)
                 else:
                     last_k_jobinfo[jobname][i]['pe_r'] = 0.0
                 if(sum_pe_w > 0.0):
                     last_k_jobinfo[jobname][i]['pe_w']       = \
-                    abs(job_info[jobname][jobid_list[j]]['pe_w']/ \
+                    abs(job_info[jobname][jobid_list[i]]['pe_w']/ \
                     (sum_pe_w / length) - 1)
                 else:
                     last_k_jobinfo[jobname][i]['pe_w'] = 0.0
-                if(last_k_jobinfo[jobname][i]['iobw_r'] < 0.2 and 
-                last_k_jobinfo[jobname][i]['iobw_w'] < 0.2 and 
-                last_k_jobinfo[jobname][i]['pe_r'] < 0.2 and 
-                last_k_jobinfo[jobname][i]['pe_w'] < 0.2):
-                    match += 1.0
+#                if(last_k_jobinfo[jobname][i]['iobw_r'] < 0.2 and 
+#                last_k_jobinfo[jobname][i]['iobw_w'] < 0.2 and 
+#                last_k_jobinfo[jobname][i]['pe_r'] < 0.2 and 
+#                last_k_jobinfo[jobname][i]['pe_w'] < 0.2):
+#                if(last_k_jobinfo[jobname][i]['iobw_r'] < 0.2):
+#                    match1 += 1.0
+#                    match += 1.0
+#                if(last_k_jobinfo[jobname][i]['iobw_w'] < 0.2):
+#                    match2 += 1.0
+                if(last_k_jobinfo[jobname][i]['pe_r'] < 0.2):
+                    match1 += 1.0
+                if(last_k_jobinfo[jobname][i]['pe_w'] < 0.2):
+                    match2 += 1.0
             last_k_jobinfo[jobname]['match'] = \
             match / all_avg_length
             all_match += match
+            all_match1 += match1
+            all_match2 += match2
                     
         all_job += len(jobid_list)
 
-    print "match: %f  all_jobid: %f"%(all_match, all_job) 
+#    print "match: %f  all_jobid: %f"%(all_match, all_job) 
+    print "match: %f  all_jobid: %f"%(all_match1, all_job) 
+    print "match: %f  all_jobid: %f"%(all_match2, all_job) 
             
     return last_k_jobinfo 
 
@@ -209,6 +325,7 @@ def cal_all_job(k):
     row_jobinfo = get_job_info('', 0)
     job_info = deal_jobinfo(row_jobinfo)
     avg_last_k_jobinfo = get_avg_last_k_jobinfo(k, job_info)
+    get_last_all_jobinfo(job_info)
     #save_avg_last_k_jobinfo(avg_topk_file, avg_last_k_jobinfo, k)
     #last_k_job = get_last_k_jobinfo(k, job_info)
     #save_last_k_jobinfo(topk_file, last_k_job, k)

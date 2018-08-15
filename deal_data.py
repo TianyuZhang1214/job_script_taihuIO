@@ -3,30 +3,30 @@ import csv
 import sys
 from read_from_source import read_runtime, read_CNC, read_big_job
 
-IOBW_file_name = '../../results_job_data/collect_data/all_data/IOBW.csv'
-IOPS_file_name = '../../results_job_data/collect_data/all_data/IOPS.csv'
-MDS_file_name = '../../results_job_data/collect_data/all_data/MDS.csv'
+IOBW_file_name = '/home/export/mount_test/swstorage/results_job_da/home/export/mount_test/swstoragellect_da/home/export/mount_test/swstoragel_da/home/export/mount_test/swstorageBW.csv'
+IOPS_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/IOPS.csv'
+MDS_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/MDS.csv'
 
-results_Med_file_name = '../../results_job_data/result_data/IO_mode/Med_result.csv'
+results_Med_file_name = '/home/export/mount_test/swstorage/results_job_data/result_data/IO_mode/Med_result.csv'
 
-draw_compute_node_count_file = '../../results_job_data/draw_csv/runtime.csv'
-draw_all_file_r = '../../results_job_data/draw_csv/IOBW_IOPS_MDS_r.csv'
-draw_all_file_w = '../../results_job_data/draw_csv/IOBW_IOPS_MDS_w.csv'
-draw_IOBW_IOPS_file_r = '../../results_job_data/draw_csv/IOBW_IOPS_r.csv'
-draw_IOBW_IOPS_file_w = '../../results_job_data/draw_csv/IOBW_IOPS_w.csv'
+draw_compute_node_count_file = '/home/export/mount_test/swstorage/results_job_data/draw_csv/runtime.csv'
+draw_all_file_r = '/home/export/mount_test/swstorage/results_job_data/draw_csv/IOBW_IOPS_MDS_r.csv'
+draw_all_file_w = '/home/export/mount_test/swstorage/results_job_data/draw_csv/IOBW_IOPS_MDS_w.csv'
+draw_IOBW_IOPS_file_r = '/home/export/mount_test/swstorage/results_job_data/draw_csv/IOBW_IOPS_r.csv'
+draw_IOBW_IOPS_file_w = '/home/export/mount_test/swstorage/results_job_data/draw_csv/IOBW_IOPS_w.csv'
 
-draw_CNC_file = '../../results_job_data/draw_csv/CNC.csv'
-draw_CNC_IOBW_r_file = '../../results_job_data/draw_csv/CNC_IOBW_r.csv'
-draw_CNC_IOBW_w_file = '../../results_job_data/draw_csv/CNC_IOBW_w.csv'
-draw_CNC_IOtime_file = '../../results_job_data/draw_csv/CNC_IOtime.csv'
+draw_CNC_file = '/home/export/mount_test/swstorage/results_job_data/draw_csv/CNC.csv'
+draw_CNC_IOBW_r_file = '/home/export/mount_test/swstorage/results_job_data/draw_csv/CNC_IOBW_r.csv'
+draw_CNC_IOBW_w_file = '/home/export/mount_test/swstorage/results_job_data/draw_csv/CNC_IOBW_w.csv'
+draw_CNC_IOtime_file = '/home/export/mount_test/swstorage/results_job_data/draw_csv/CNC_IOtime.csv'
 
-draw_corehour_file = '../../results_job_data/draw_csv/IOtime_corehour.csv'
-draw_Med_corehour_file = '../../results_job_data/draw_csv/Med_IOtime_corehour.csv'
+draw_corehour_file = '/home/export/mount_test/swstorage/results_job_data/draw_csv/IOtime_corehour.csv'
+draw_Med_corehour_file = '/home/export/mount_test/swstorage/results_job_data/draw_csv/Med_IOtime_corehour.csv'
 
-draw_CNC_sum_IOBW_file = '../../results_job_data/draw_csv/CNC_small_sum_IOBW.csv'
-draw_CNC_IOBW_file = '../../results_job_data/draw_csv/CNC_IOBW.csv'
+draw_CNC_sum_IOBW_file = '/home/export/mount_test/swstorage/results_job_data/draw_csv/CNC_small_sum_IOBW.csv'
+draw_CNC_IOBW_file = '/home/export/mount_test/swstorage/results_job_data/draw_csv/CNC_IOBW.csv'
 
-draw_big_job_undone_file = '../../results_job_data/draw_csv/big_job_undone.csv'
+draw_big_job_undone_file = '/home/export/mount_test/swstorage/results_job_data/draw_csv/big_job_undone.csv'
 
 
 def read_Med_results():

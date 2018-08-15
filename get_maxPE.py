@@ -1,5 +1,5 @@
-pe_file = "../../results_job_data/collect_data/all_data/maxPE1.csv"
-max_pe_file = "../../results_job_data/collect_data/all_data/maxPE2.csv"
+pe_file = "/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/maxPE1.csv"
+max_pe_file = "/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/maxPE2.csv"
 
 
 def read_PE():

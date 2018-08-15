@@ -47,17 +47,23 @@ def get_jobid():
     jobid = []
     conn = MySQLdb.connect(host='20.0.2.201', user='root', db='JOB_IO', passwd='', port=3306) 
     cursor = conn.cursor()
-    sql = "select  from JOB_IO_INFO "
+    sql = "select * from JOB_IO_INFO where JOBID = 42606463;"
     cursor.execute(sql)
     result = cursor.fetchall()
     for res in result:
-        jobid.append(str(res)[2:-3])
-    print jobid[0]
+        print res
+        #jobid.append(str(res)[2:-3])
+    #for job in jobid:
+        #print job
     conn.commit()
     cursor.close()
     conn.close()
 
     return jobid
+    
+
+    
+    
     
 if __name__ == "__main__":
     

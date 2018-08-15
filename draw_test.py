@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
-fwd_file = "../../results_job_data/job_trace/42340081/fwd.csv"
-front_file = "../../results_job_data/job_trace/42340081/front_end_bw.csv"
-back_file = "../../results_job_data/job_trace/42340081/back_end_agg.csv"
+fwd_file = "/home/export/mount_test/swstorage/results_job_data/job_trace/42340081/fwd.csv"
+front_file = "/home/export/mount_test/swstorage/results_job_data/job_trace/42340081/front_end_bw.csv"
+back_file = "/home/export/mount_test/swstorage/results_job_data/job_trace/42340081/back_end_agg.csv"
 
 def read_value(file_name):
     f = open(file_name, "r")

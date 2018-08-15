@@ -193,8 +193,8 @@ def show_job_all(jobid):
 
     
     print "index: ", index
-    count_ip = len(iplist)/size_ip
-    remainder = len(iplist)%size_ip
+    count_ip = len(iplist) / size_ip
+    remainder = len(iplist) % size_ip
     results_message = [] 
     results_host = []
     print "count_ip: ", count_ip
@@ -206,7 +206,7 @@ def show_job_all(jobid):
             print "Now search index: ", index[lnd]
             if (count_ip > 0):
                 for c1 in xrange(count_ip):
-                    print "Now search ip iteration: ", c1
+#                    print "Now search ip iteration: ", iplist[c1*size_ip:c1*size_ip+size_ip]
                     try:
                         results_message_tmp, results_host_tmp = es_search.search(time1, time2,\
                         iplist[c1*size_ip:c1*size_ip+size_ip], index[lnd], 10)
@@ -215,8 +215,9 @@ def show_job_all(jobid):
                     except Exception as e:
                         print e
                 if(remainder > 0):    
-                    results_message_tmp, results_host_tmp = es_search.search(time1, time2,\
-                    iplist[count_ip*size_ip:count_ip*size_ip + remainder], index[lnd], 1)
+#                     print "Now search ip iteration: ", iplist[count_ip*size_ip:count_ip*size_ip + remainder]
+                     results_message_tmp, results_host_tmp = es_search.search(time1, time2,\
+                     iplist[count_ip*size_ip:count_ip*size_ip + remainder], index[lnd], 1)
             else:
                 results_message_tmp, results_host_tmp = es_search.search(time1, time2,\
                 iplist, index[lnd], 1)
@@ -225,11 +226,13 @@ def show_job_all(jobid):
         results_message_tmp = ""
         results_host_tmp = ""
         print "Warning, The ES index may be missing!!!!!"
-    
+
     results_message += results_message_tmp
     results_host += results_host_tmp
+    host_set1 = set(results_host)
+    host_set2 = set(iplist)
     print 'message length: ', len(results_message)
-    
+
     resultr_band,resultw_band,resultr_iops,resultw_iops,resultr_open,\
     resultw_close, resultr_size, resultw_size, dictr, dictw, file_count, \
     file_open, fd_info, fwd_file_map \
@@ -245,10 +248,10 @@ def show_job_all(jobid):
     file_open_count = [len(file_open[i]) for i in range(len(file_open))]
 
     if options.draw == True:
-        if(not os.path.exists('../../results_job_data/job_trace/' + jobid)):
-            os.mkdir('../../results_job_data/job_trace/' + jobid)
-        front_file_name = '../../results_job_data/job_trace/'+ jobid + '/front_end_bw'+'.csv'
-        tmp_file_name = '../../results_job_data/job_trace/'+ jobid + '/bw_iops_mds'+'.csv'
+        if(not os.path.exists('/home/export/mount_test/swstorage/results_job_data/job_trace/' + jobid)):
+            os.mkdir('/home/export/mount_test/swstorage/results_job_data/job_trace/' + jobid)
+        front_file_name = '/home/export/mount_test/swstorage/results_job_data/job_trace/'+ jobid + '/front_end_bw'+'.csv'
+        tmp_file_name = '/home/export/mount_test/swstorage/results_job_data/job_trace/'+ jobid + '/bw_iops_mds'+'.csv'
         save_tmp(resultr_band, resultw_band, resultr_iops, resultw_iops, \
         resultr_open, resultw_close, pe_r, pe_w, tmp_file_name)
         save_front_bw(resultr_band, resultw_band, front_file_name)
@@ -258,7 +261,7 @@ def show_job_all(jobid):
         draw_d(file_open_count, 'Unique File Count')
 
     if options.trace == True:
-        trace_file_name = '../../results_job_data/job_trace/' + jobid + '.csv'
+        trace_file_name = '/home/export/mount_test/swstorage/results_job_data/job_trace/' + jobid + '.csv'
         save_trace(results_message, results_host, trace_file_name)
 
     if options.fd_info == True:
@@ -320,18 +323,18 @@ def show_job_all(jobid):
         else:
             bandr, bandw = get_ost_data(time1, time2, ost_list, index, host)
 
-            if(not os.path.exists('../../results_job_data/job_trace/' + jobid)):
-                os.mkdir('../../results_job_data/job_trace/' + jobid)
-            ost_file_name = '../../results_job_data/job_trace/'+ jobid + '/back_end'+'.csv'
-            ost_agg_file_name = '../../results_job_data/job_trace/'+ jobid + '/back_end_agg'+'.csv'
+            if(not os.path.exists('/home/export/mount_test/swstorage/results_job_data/job_trace/' + jobid)):
+                os.mkdir('/home/export/mount_test/swstorage/results_job_data/job_trace/' + jobid)
+            ost_file_name = '/home/export/mount_test/swstorage/results_job_data/job_trace/'+ jobid + '/back_end'+'.csv'
+            ost_agg_file_name = '/home/export/mount_test/swstorage/results_job_data/job_trace/'+ jobid + '/back_end_agg'+'.csv'
 
             save_back_bw(ost_list, bandr, bandw, ost_file_name)
             save_back_bw_agg(ost_list, bandr, bandw, ost_agg_file_name)
 
     if options.fwd_info == True:
-        if(not os.path.exists('../../results_job_data/job_trace/' + jobid)):
-            os.mkdir('../../results_job_data/job_trace/' + jobid)
-        fwd_file_name = '../../results_job_data/job_trace/'+ jobid + '/fwd'+'.csv'
+        if(not os.path.exists('/home/export/mount_test/swstorage/results_job_data/job_trace/' + jobid)):
+            os.mkdir('/home/export/mount_test/swstorage/results_job_data/job_trace/' + jobid)
+        fwd_file_name = '/home/export/mount_test/swstorage/results_job_data/job_trace/'+ jobid + '/fwd'+'.csv'
         for fwd in fwd_file_map:
             try:
                 print fwd

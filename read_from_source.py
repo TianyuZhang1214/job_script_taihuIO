@@ -3,9 +3,9 @@ import csv
 import sys
 import datetime
 
-all_file_name = '../../source_job_data/JOB_log_all.csv'
-other_file_name = '../../source_job_data/JOB_log_other.csv'
-file_name = '../../source_job_data/JOB_log.csv'
+all_file_name = '/home/export/mount_test/swstorage/source_job_data/JOB_log_all.csv'
+other_file_name = '/home/export/mount_test/swstorage/source_job_data/JOB_log_other.csv'
+file_name = '/home/export/mount_test/swstorage/source_job_data/JOB_log.csv'
 
 def read_big_job():
 

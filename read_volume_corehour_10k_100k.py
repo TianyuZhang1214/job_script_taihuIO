@@ -1,6 +1,6 @@
-jobid_file = '../../source_job_data/jobid_corehour_1000k.csv'
-volume_file = '../../results_job_data/collect_data/all_data/IOBW.csv'
-save_volume_file = '../../results_job_data/volume/jobid_corehour_1000k.csv'
+jobid_file = '/home/export/mount_test/swstorage/source_job_data/jobid_corehour_1000k.csv'
+volume_file = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/IOBW.csv'
+save_volume_file = '/home/export/mount_test/swstorage/results_job_data/volume/jobid_corehour_1000k.csv'
 
 def read_jobid():
     f = open(jobid_file, 'r')

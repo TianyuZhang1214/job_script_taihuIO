@@ -15,14 +15,14 @@ from deal_generator import deal_all_message
 #Last JOBID queried before: 40645719
 #40786081
 #40880389
-startid = '42500000'
-thread_count = 2
+startid = '42000000'
+thread_count = 4
 size_ip = 50
-table = 'JOB_log'
+table = 'JOB_log_4250'
 
-abnormal_job_file = "../../results_job_data/collect_data/insert_data/abnormal_insert_job.csv"
-job_file = "../../results_job_data/collect_data/insert_data/insert_job_completed.csv"
-job_file_all = "../../results_job_data/collect_data/insert_data/insert_job_all.csv"
+abnormal_job_file = "/home/export/mount_test/swstorage/results_job_data/collect_data/insert_data/abnormal_insert_job.csv"
+job_file = "/home/export/mount_test/swstorage/results_job_data/collect_data/insert_data/insert_job_completed.csv"
+job_file_all = "/home/export/mount_test/swstorage/results_job_data/collect_data/insert_data/insert_job_all.csv"
 
 def save_job(jobid, file_name):
     csvfile = file(file_name,'ab')
@@ -135,15 +135,16 @@ def get_nonexistent_job(jobid_read):
     return jobid
 
 def insert(jobid, column):
+    print len(column)
     conn = MySQLdb.connect(host='20.0.2.201',user='root',db='JOB_IO',passwd='',port=3306) 
     print "connect success-----------------"
     try:
         resu = get_re_jobid(jobid)
-        print resu
         for val in resu:
             job_name = val[1]
             program_name = val[2]
             CNC = int(val[5])
+            corehour = float(val[7])
         try:
             sum_IOBW_r, sum_IOBW_w, \
             count_IOBW_r, count_IOBW_w, count_IOBW_rw, \
@@ -158,32 +159,32 @@ def insert(jobid, column):
             compute_result(jobid)
             cursor=conn.cursor()
             sql="INSERT INTO JOB_IO_INFO( \
-            "+column[0]+","+column[1]+","+ \
-            column[2]+","+column[3]+","+ \
-            column[4]+","+column[5]+","+ \
-            column[6]+","+column[7]+","+ \
-            column[8]+","+column[9]+","+ \
-            column[10]+","+column[11]+","+ \
-            column[12]+","+column[13]+","+ \
-            column[14]+","+column[15]+","+ \
-            column[16]+","+column[17]+","+ \
-            column[18]+","+column[19]+","+ \
-            column[20]+","+column[21]+","+ \
-            column[22]+","+column[23]+","+ \
-            column[24]+","+column[25]+","+ \
-            column[26]+","+column[27] + \
-            column[28] + ")"\
+            "+column[0] + "," + column[1]  + "," + \
+            column[2]   + "," + column[3]  + "," + \
+            column[4]   + "," + column[5]  + "," + \
+            column[6]   + "," + column[7]  + "," + \
+            column[8]   + "," + column[9]  + "," + \
+            column[10]  + "," + column[11] + "," + \
+            column[12]  + "," + column[13] + "," + \
+            column[14]  + "," + column[15] + "," + \
+            column[16]  + "," + column[17] + "," + \
+            column[18]  + "," + column[19] + "," + \
+            column[20]  + "," + column[21] + "," + \
+            column[22]  + "," + column[23] + "," + \
+            column[24]  + "," + column[25] + "," + \
+            column[26]  + "," + column[27] + "," + \
+            column[28]  + "," + column[29] + ")"\
             +" values('%s','%s','%d','%f','%d','%f',\
             '%f','%d','%f','%d','%f','%d','%f','%f','%d','%f',\
             '%d','%d','%d','%d','%f','%d','%d','%f',\
-            '%d','%d','%d','%d','%s')" \
+            '%d','%d','%d','%d','%s', '%f')" \
             %(jobid, program_name, CNC, sum_IOBW_r, count_IOBW_r, average_IOBW_r, \
             sum_IOBW_w, count_IOBW_w, average_IOBW_w, count_IOBW_rw, \
             sum_IOPS_r, count_IOPS_r, average_IOPS_r, \
             sum_IOPS_w, count_IOPS_w, average_IOPS_w, count_IOPS_rw, count_IOPS_rw_all, \
             sum_MDS_o, count_MDS_o, average_MDS_o, \
             sum_MDS_c, count_MDS_c, average_MDS_c, count_MDS_oc, \
-            max_PE_r, max_PE_w, file_all_count, JOB_NAME)
+            max_PE_r, max_PE_w, file_all_count, job_name, corehour)
             cursor.execute(sql)
             conn.commit()
             cursor.close()
@@ -213,25 +214,26 @@ def get_column_name():
 def get_largest_jobid(table):
     conn=MySQLdb.connect(host='20.0.2.15',user='swqh',db='JOB',passwd='123456',port=3306) 
     cursor=conn.cursor()
-    sql = "select max(JOBID) from %s"%table
+    sql = "select max(convert(JOBID,unsigned)) from %s"%table
     cursor.execute(sql)
     result=cursor.fetchall()
     max_jobid = 0
     for re in result:
-        max_jobid = str(re)[2:-3]
+        max_jobid = re[0]
     cursor.close()
     conn.close()
     return max_jobid
-
 
 def get_jobid_larger_32(startid, endid, table):
     conn=MySQLdb.connect(host='20.0.2.15',user='swqh',db='JOB',passwd='123456',port=3306) 
     cursor=conn.cursor()
     sql = "select JOBID from %s where \
-    state = 'Done' and \
+    state = 'Done' and QUEUE like '%%sw%%' and \
     convert(JOBID,UNSIGNED) >= %s and \
-    convert(JOBID,UNSIGNED) < %s and CNC >= 32 order by JOBID"\
+    convert(JOBID,UNSIGNED) < %s and \
+    CNC >= 32 order by JOBID"\
     %(table, startid, endid)
+    print sql
     cursor.execute(sql)
     result=cursor.fetchall()
     jobid = []

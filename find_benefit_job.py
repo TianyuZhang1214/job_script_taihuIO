@@ -1,7 +1,7 @@
 from read_from_source import read_corehour
 
-jobid_file = '../../results_job_data/benefit_job/Nto1.csv'
-#jobid_file = '../../results_job_data/collect_data/all_data/jobid.csv'
+jobid_file = '/home/export/mount_test/swstorage/results_job_data/benefit_job/Nto1.csv'
+#jobid_file = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/jobid.csv'
 def read_jobid():
     f = open(jobid_file, 'r')
     jobid = []

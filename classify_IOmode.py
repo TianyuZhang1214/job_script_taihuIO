@@ -7,22 +7,22 @@ IOmode_N_N = 800.0
 IOmode_N_1 = 400.0 
 IOmode_1_1 = 100.0
 
-IOBW_file_name = '../../results_job_data/collect_data/all_IOmode/IOBW.csv'
-MDS_file_name = '../../results_job_data/collect_data/all_IOmode/MDS.csv'
-PE_r_file_name = '../../results_job_data/collect_data/all_IOmode/PER.csv'
-PE_w_file_name = '../../results_job_data/collect_data/all_IOmode/PEW.csv'
+IOBW_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_IOmode/IOBW.csv'
+MDS_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_IOmode/MDS.csv'
+PE_r_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_IOmode/PER.csv'
+PE_w_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_IOmode/PEW.csv'
 
-PE_file_name = '../../results_job_data/collect_data/all_data/maxPE.csv'
+PE_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/maxPE.csv'
 
-results_file_name = '../../results_job_data/result_data/result.csv'
-results_Med_file_name = '../../results_job_data/result_data/Med_result.csv'
+results_file_name = '/home/export/mount_test/swstorage/results_job_data/result_data/result.csv'
+results_Med_file_name = '/home/export/mount_test/swstorage/results_job_data/result_data/Med_result.csv'
 
-source_file_name = '../../source_data/JOB_log.csv'
+source_file_name = '/home/export/mount_test/swstorage/source_data/JOB_log.csv'
 
-#IOBW_file_name = '../../results_job_data/collect_data/all_IOmode/stage_all_IOBW.csv'
-#MDS_file_name = '../../results_job_data/collect_data/all_IOmode/stage_all_MDS.csv'
-#PE_r_file_name = '../../results_job_data/collect_data/all_IOmode/stage_all_PER.csv'
-#PE_w_file_name = '../../results_job_data/collect_data/all_IOmode/stage_all_PEW.csv'
+#IOBW_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_IOmode/stage_all_IOBW.csv'
+#MDS_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_IOmode/stage_all_MDS.csv'
+#PE_r_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_IOmode/stage_all_PER.csv'
+#PE_w_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_IOmode/stage_all_PEW.csv'
 #
 #results_file_name = 'result_data/stage_all_IOmode_result.csv'
 #results_Med_file_name = 'result_data/stage_all_IOmode_Med_result.csv'

@@ -19,7 +19,7 @@ from deal_generator import deal_all_message
 
 size_ip = 50
 
-big_job_file_name = '../../results_job_data/draw_csv/big_job_undone.csv'
+big_job_file_name = '/home/export/mount_test/swstorage/results_job_data/draw_csv/big_job_undone.csv'
 
     
 def save_tmp(resultr_band, resultw_band, resultr_iops, resultw_iops, resultr_open, resultw_close, pe_r, pe_w, tmp_file_name):
@@ -241,58 +241,58 @@ def test_save_main(starttime, endtime, jobid):
     title_IOmode = 'test_IO'
     title_IO = 'test_IO'
     
-    IOBW_file = file('../../results_job_data/collect_data/'+ title+'/IOBW.csv','wb')
+    IOBW_file = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/IOBW.csv','wb')
     writer_IOBW = csv.writer(IOBW_file)
     writer_IOBW.writerow(['program_name', 'jobID', 'start_time', 'end_time', \
     'sum_READ', 'sum_WRITE', 'count_r', 'count_w', 'count_rw', \
     'average_r', 'average_w'])
 
-    IOPS_file = file('../../results_job_data/collect_data/'+ title+'/IOPS.csv','wb')
+    IOPS_file = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/IOPS.csv','wb')
     writer_IOPS = csv.writer(IOPS_file)
     writer_IOPS.writerow(['program_name', 'jobID', 'start_time', 'end_time', \
     'sum_READ', 'sum_WRITE', 'count_r', 'count_w', 'count_rw', 'count_rw_all', \
     'average_r', 'average_w'])
 
-    maxPE_file = file('../../results_job_data/collect_data/'+ title+'/maxPE.csv','wb')
+    maxPE_file = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/maxPE.csv','wb')
     writer_maxPE = csv.writer(maxPE_file)
     writer_maxPE.writerow(['program_name', 'jobID', 'start_time', 'end_time', \
     'max_PE_r', 'max_PE_w'])
 
-    MDS_file = file('../../results_job_data/collect_data/'+ title+'/MDS.csv','wb')
+    MDS_file = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/MDS.csv','wb')
     writer_MDS = csv.writer(MDS_file)
     writer_MDS.writerow(['program_name', 'jobID', 'start_time', 'end_time', \
     'sum_OPEN', 'sum_CLOSE', 'count_o', 'count_c', 'count_oc', \
     'average_o', 'average_c'])
 
-    size_r_file=file('../../results_job_data/collect_data/'+ title +'/SIZE_r.csv','wb')
+    size_r_file=file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title +'/SIZE_r.csv','wb')
     writer_r=csv.writer(size_r_file)
     writer_r.writerow(['Read_size','count','total_size'])
 
-    size_w_file=file('../../results_job_data/collect_data/'+ title +'/SIZE_w.csv','wb')
+    size_w_file=file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title +'/SIZE_w.csv','wb')
     writer_w=csv.writer(size_w_file)
     writer_w.writerow(['Write_size','count','total_size'])
 
-    IOBW_file_IO = file('../../results_job_data/collect_data/'+ title_IO+'/IOBW.csv','wb')
+    IOBW_file_IO = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title_IO+'/IOBW.csv','wb')
     writer_IOBW_IO = csv.writer(IOBW_file_IO)
     writer_IOBW_IO.writerow(['IOBW_r', 'IOBW_w'])
 
-    PER_file_IO = file('../../results_job_data/collect_data/'+ title_IO+'/PER.csv','wb')
+    PER_file_IO = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title_IO+'/PER.csv','wb')
     writer_PER_IO = csv.writer(PER_file_IO)
     writer_PER_IO.writerow(['max_PE_r'])
 
-    PEW_file_IO = file('../../results_job_data/collect_data/'+ title_IO+'/PEW.csv','wb')
+    PEW_file_IO = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title_IO+'/PEW.csv','wb')
     writer_PEW_IO = csv.writer(PEW_file_IO)
     writer_PEW_IO.writerow(['max_PE_w'])
 
-    MDS_file_IO = file('../../results_job_data/collect_data/'+ title_IO+'/MDS.csv','wb')
+    MDS_file_IO = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title_IO+'/MDS.csv','wb')
     writer_MDS_IO = csv.writer(MDS_file_IO)
     writer_MDS_IO.writerow(['MDS_r', 'MDS_w'])
    
-    file_name_file_IO = file('../../results_job_data/collect_data/'+ title_IO+'/file_name.csv','wb')
+    file_name_file_IO = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title_IO+'/file_name.csv','wb')
     writer_file_name_IO = csv.writer(file_name_file_IO)
     writer_file_name_IO.writerow(['file_name_set', 'file_count'])
     
-    jobid_abnormal_file = file('../../results_job_data/collect_data/'+ title+'/jobid_abnormal.csv','wb')
+    jobid_abnormal_file = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/jobid_abnormal.csv','wb')
     writer_jobid_abnormal = csv.writer(jobid_abnormal_file)
     try:
     	save_main(starttime, endtime, jobid, 'cc', 1111, \
@@ -389,7 +389,7 @@ def show_job_all(start_time, end_time, jobid):
     pe_r = show_process(dictr,'r',min_time,max_time,jobid)
     pe_w = show_process(dictw,'b',min_time,max_time,jobid)
 
-    tmp_file_name = '../../results_job_data/tmp_csv/' + jobid + '.csv'
+    tmp_file_name = '/home/export/mount_test/swstorage/results_job_data/tmp_csv/' + jobid + '.csv'
     print tmp_file_name 
     save_tmp(resultr_band, resultw_band, resultr_iops, resultw_iops, resultr_open, resultw_close, pe_r, pe_w, tmp_file_name)
     

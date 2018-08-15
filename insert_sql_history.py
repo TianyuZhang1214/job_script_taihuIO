@@ -11,14 +11,14 @@ from deal_generator import deal_all_message
 import time
 import csv
 
-IOBW_file_name = '../../results_job_data/collect_data/all_data/IOBW.csv'
-IOPS_file_name = '../../results_job_data/collect_data/all_data/IOPS.csv'
-MDS_file_name = '../../results_job_data/collect_data/all_data/MDS.csv'
-PE_file_name = '../../results_job_data/collect_data/all_data/maxPE.csv'
+IOBW_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/IOBW.csv'
+IOPS_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/IOPS.csv'
+MDS_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/MDS.csv'
+PE_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_data/maxPE2.csv'
 
-file_name = '../../source_job_data/JOB_log.csv'
+file_name = '/home/export/mount_test/swstorage/source_job_data/JOB_log.csv'
 
-IOPS_BW_MDS_file_name = '../../results_job_data/collect_data/format_data/IOPS_BW_MDS_file.csv'
+IOPS_BW_MDS_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/format_data/IOPS_BW_MDS_file.csv'
 
 thread_count=2
 #def save_format_data():
@@ -30,38 +30,35 @@ thread_count=2
 
 def read_jobID_prog():
 
-    jobID = []
-    prog_name = []
-    CNC = []
+    job_info = dict()
 
     reader = csv.reader(open(file_name, 'rU'), dialect=csv.excel_tab)
     for line in reader:
         if(len(line) >= 16):
-            jobID.append(line[0].strip())
-            prog_name.append(line[14].strip())
-            CNC.append(int(line[4].strip()))
+            job_info[line[0].strip()] = {}
+            job_info[line[0].strip()]['prog_name'] = line[14].strip()
+            job_info[line[0].strip()]['CNC'] = int(line[4].strip())
 
-    return jobID, prog_name, CNC
+    return job_info
 
 def read_PE():
     reader = csv.reader(open(PE_file_name , 'rU'), dialect=csv.excel_tab)
     next(reader)
 
-    pe_r = []
-    pe_w = []
+    pe_info = dict()
 
     for line in reader:
-        x = str(line).split(',')
-        if(len(x) == 6):
-            try:
-                pe_r.append(float(x[4].strip()))
-                pe_w.append(float(x[5][:-2].strip()))
-            except Exception as e:
-                print x[4]
-                print x[5][:-2]
-                continue
+        x = str(line).split()
+#        if(len(x) == 6):
+        try:
+            pe_info[x[0][2:]] = {}
+            pe_info[x[0][2:]]['pe_r'] = float(x[1].strip())
+            pe_info[x[0][2:]]['pe_w'] = float(x[2][:-2].strip())
+        except Exception as e:
+            print e
+            continue
 
-    return pe_r, pe_w
+    return pe_info
 
 def read_IOBW():
     reader = csv.reader(open(IOBW_file_name , 'rU'), dialect=csv.excel_tab)
@@ -89,8 +86,8 @@ def read_IOBW():
                 average_w.append(float(x[10][:-2].strip()))
                 jobID.append(x[1].strip())
             except Exception as e:
-                print x
-                print len(x)
+#                print x
+#                print len(x)
                 continue
 
     return jobID, sum_READ, sum_WRITE, count_r, count_w, count_rw, average_r, average_w
@@ -121,7 +118,7 @@ def read_IOPS():
                 average_r.append(float(x[10].strip()))
                 average_w.append(float(x[11][:-2].strip()))
             except Exception as e:
-                print x
+#                print x
                 continue
 
     return sum_READ, sum_WRITE, count_r, count_w, count_rw, count_rw_all, average_r, average_w
@@ -184,46 +181,37 @@ def get_all_data():
     average_MDS_c, file_all_count = \
     read_MDS()
           
-    pe_r, pe_w = read_PE()
+    pe_info = read_PE()
+    job_info = read_jobID_prog()
     
-    print len(jobID)
-    print len(sum_IOBW_r)
-    print len(sum_IOBW_w)
-    print len(count_IOBW_r)
-    print len(count_IOBW_w)
-    print len(count_IOBW_rw) 
-    print len(average_IOBW_r) 
-    print len(average_IOBW_w)
+    print 'jobID)   : %d'%(len(jobID))
+    print 'sum_IOBW_: %d'%(len(sum_IOBW_r))
+    print 'sum_IOBW_: %d'%(len(sum_IOBW_w))
+    print 'count_IOB: %d'%(len(count_IOBW_r))
+    print 'count_IOB: %d'%(len(count_IOBW_w))
+    print 'count_IOB: %d'%(len(count_IOBW_rw)) 
+    print 'average_I: %d'%(len(average_IOBW_r)) 
+    print 'average_I: %d'%(len(average_IOBW_w))
+    print 'sum_IOPS_: %d'%(len(sum_IOPS_r))
+    print 'sum_IOPS_: %d'%(len(sum_IOPS_w))
+    print 'count_IOP: %d'%(len(count_IOPS_r))
+    print 'count_IOP: %d'%(len(count_IOPS_w))
+    print 'count_IOP: %d'%(len(count_IOPS_rw))
+    print 'count_IOP: %d'%(len(count_IOPS_rw_all))
+    print 'average_I: %d'%(len(average_IOPS_r) )
+    print 'average_I: %d'%(len(average_IOPS_w))
+    print 'sum_MDS_o: %d'%(len(sum_MDS_o))
+    print 'sum_MDS_c: %d'%(len(sum_MDS_c))
+    print 'count_MDS: %d'%(len(count_MDS_o))
+    print 'count_MDS: %d'%(len(count_MDS_c))
+    print 'count_MDS: %d'%(len(count_MDS_oc))
+    print 'average_M: %d'%(len(average_MDS_o))
+    print 'average_M: %d'%(len(average_MDS_c))
+    print 'file_all_: %d'%(len(file_all_count))
+    print 'pe_info) : %d'%(len(pe_info))
+    print 'job_info) : %d'%(len(job_info))
     
-    print len(sum_IOPS_r)
-    print len(sum_IOPS_w)
-    print len(count_IOPS_r)
-    print len(count_IOPS_w)
-    print len(count_IOPS_rw)
-    print len(count_IOPS_rw_all)
-    print len(average_IOPS_r) 
-    print len(average_IOPS_w)
-    
-    print len(sum_MDS_o)
-    print len(sum_MDS_c)
-    print len(count_MDS_o)
-    print len(count_MDS_c)
-    print len(count_MDS_oc)
-    print len(average_MDS_o)
-    print len(average_MDS_c)
-    print len(file_all_count)
-    
-    print len(pe_r)
-    print len(pe_w)
-    
-    jobID_read, program_name_read, CNC_read = read_jobID_prog()
-    
-    program_name, CNC = \
-    search_for_info(jobID, jobID_read, CNC_read, program_name_read)
-
-    print len(program_name)
-
-    return jobID, program_name, CNC, \
+    return jobID, job_info, \
     sum_IOBW_r, sum_IOBW_w, \
     count_IOBW_r, count_IOBW_w, count_IOBW_rw, \
     average_IOBW_r, average_IOBW_w, \
@@ -233,13 +221,13 @@ def get_all_data():
     sum_MDS_o, sum_MDS_c, \
     count_MDS_o, count_MDS_c, count_MDS_oc, \
     average_MDS_o, average_MDS_c, \
-    pe_r, pe_w, file_all_count
+    pe_info, file_all_count
 
 def insert(column):
     conn = MySQLdb.connect(host='20.0.2.201',user='root',db='JOB_IO',passwd='',port=3306) 
     print "connect success-----------------"
     try:
-        jobID, program_name, CNC, \
+        jobID, job_info, \
         sum_IOBW_r, sum_IOBW_w, \
         count_IOBW_r, count_IOBW_w, count_IOBW_rw, \
         average_IOBW_r, average_IOBW_w, \
@@ -249,7 +237,7 @@ def insert(column):
         sum_MDS_o, sum_MDS_c, \
         count_MDS_o, count_MDS_c, count_MDS_oc, \
         average_MDS_o, average_MDS_c, \
-        max_PE_r, max_PE_w, file_all_count= \
+        pe_info, file_all_count= \
         get_all_data()
         cursor=conn.cursor()
         for i in range(len(jobID)):
@@ -273,7 +261,8 @@ def insert(column):
                 '%f','%d','%f','%d','%f','%d','%f','%f','%d','%f',\
                 '%d','%d','%d','%d','%f','%d','%d','%f',\
                 '%d','%d','%d','%d')" \
-                %(jobID[i], program_name[i], CNC[i], \
+                %(jobID[i], job_info[jobID[i]]['prog_name'], \
+                job_info[jobID[i]]['CNC'], \
                 sum_IOBW_r[i], count_IOBW_r[i], \
                 average_IOBW_r[i], sum_IOBW_w[i], \
                 count_IOBW_w[i], average_IOBW_w[i], \
@@ -285,17 +274,19 @@ def insert(column):
                 count_MDS_o[i], average_MDS_o[i], \
                 sum_MDS_c[i], count_MDS_c[i], \
                 average_MDS_c[i], count_MDS_oc[i], \
-                max_PE_r[i], max_PE_w[i], file_all_count[i])
+                pe_info[jobID[i]]['pe_r'], \
+                pe_info[jobID[i]]['pe_w'], \
+                file_all_count[i])
                 print sql
                 cursor.execute(sql)
                 conn.commit()
             except Exception as e:
-                print e
+#                print e
                 conn.rollback()
         cursor.close()
     except Exception as e:
-        print e
-    conn.close()
+#        print e
+        conn.close()
 
 def get_column_name():
     conn=MySQLdb.connect(host='20.0.2.201',user='root',db='JOB_IO',passwd='',port=3306) 

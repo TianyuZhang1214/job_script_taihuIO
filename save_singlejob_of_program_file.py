@@ -12,11 +12,11 @@ import time
 from classify_IOmode import search_corehour
 
 
-start_file_name = '../../source_job_data/JOB_log_41027800.csv'
-continue_file_name = '../../source_job_data/JOB_log_41027800.csv'
+start_file_name = '/home/export/mount_test/swstorage/source_job_data/JOB_log_41027800.csv'
+continue_file_name = '/home/export/mount_test/swstorage/source_job_data/JOB_log_41027800.csv'
 
 test_file_name = 'test_csv/wrf_8.exe.csv'
-abnormal_file_name = '../../results_job_data/collect_data/20180116102430/jobid_abnormal.csv'
+abnormal_file_name = '/home/export/mount_test/swstorage/results_job_data/collect_data/20180116102430/jobid_abnormal.csv'
 
 all_pid = []
 
@@ -101,18 +101,18 @@ def create_result_files():
     title = time_stamp +"/thread_"+str(my_pid)
 #    print title_IO 
 #    print title 
-    os.mkdir("../../results_job_data/collect_data/" + title)
+    os.mkdir("/home/export/mount_test/swstorage/results_job_data/collect_data/" + title)
 
-    all_file = file('../../results_job_data/collect_data/'+ title+'/all.csv','wb')
+    all_file = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/all.csv','wb')
     writer_all = csv.writer(all_file)
     
-    file_name_r = file('../../results_job_data/collect_data/'+ title+'/IO_phase_r.csv','wb')
+    file_name_r = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/IO_phase_r.csv','wb')
     writer_file_name_r = csv.writer(file_name_r)
 
-    file_name_w = file('../../results_job_data/collect_data/'+ title+'/IO_phase_w.csv','wb')
+    file_name_w = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/IO_phase_w.csv','wb')
     writer_file_name_w  = csv.writer(file_name_w)
    
-    jobid_abnormal_file = file('../../results_job_data/collect_data/'+ title+'/jobid_abnormal.csv','wb')
+    jobid_abnormal_file = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/jobid_abnormal.csv','wb')
     writer_jobid_abnormal = csv.writer(jobid_abnormal_file)
 
 def create_result_files_pid(my_pid):
@@ -120,18 +120,18 @@ def create_result_files_pid(my_pid):
     title_IO = time_stamp +"_IOmode/thread_"+str(my_pid)
     title = time_stamp +"/thread_"+str(my_pid)
     
-    os.mkdir("../../results_job_data/collect_data/" + title)
+    os.mkdir("/home/export/mount_test/swstorage/results_job_data/collect_data/" + title)
     
-    all_file = file('../../results_job_data/collect_data/'+ title+'/all.csv','wb')
+    all_file = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/all.csv','wb')
     writer_all = csv.writer(all_file)
     
-    file_name_r = file('../../results_job_data/collect_data/'+ title+'/IO_phase_r.csv','wb')
+    file_name_r = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/IO_phase_r.csv','wb')
     writer_file_name_r = csv.writer(file_name_r)
 
-    file_name_w = file('../../results_job_data/collect_data/'+ title+'/IO_phase_w.csv','wb')
+    file_name_w = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/IO_phase_w.csv','wb')
     writer_file_name_w  = csv.writer(file_name_w)
    
-    jobid_abnormal_file = file('../../results_job_data/collect_data/'+ title+'/jobid_abnormal.csv','wb')
+    jobid_abnormal_file = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/jobid_abnormal.csv','wb')
     writer_jobid_abnormal = csv.writer(jobid_abnormal_file)
 
 def compute_result(jobID):
@@ -145,13 +145,13 @@ def compute_result(jobID):
     print title
     print title_IO
     try:
-        if(not os.path.exists('../../results_job_data/collect_data/'+title)):
+        if(not os.path.exists('/home/export/mount_test/swstorage/results_job_data/collect_data/'+title)):
             create_result_files_pid(my_pid)
             print title
     except Exception as e:
         print e
    
-    jobid_abnormal_file = file('../../results_job_data/collect_data/'+ title+'/jobid_abnormal.csv','ab')
+    jobid_abnormal_file = file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/jobid_abnormal.csv','ab')
     writer_jobid_abnormal = csv.writer(jobid_abnormal_file)
 
     try:

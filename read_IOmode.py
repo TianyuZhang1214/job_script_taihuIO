@@ -1,8 +1,8 @@
-file_name_r = '../../results_job_data/collect_data/all_IOphase/IO_phase_r.csv'
-file_name_w = '../../results_job_data/collect_data/all_IOphase/IO_phase_w.csv'
+file_name_r = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_IOphase/IO_phase_r.csv'
+file_name_w = '/home/export/mount_test/swstorage/results_job_data/collect_data/all_IOphase/IO_phase_w.csv'
 
-result_file_name_r = '../../results_job_data/result_data/IOmode_by_volumn/IO_mode_r_count.csv'
-result_file_name_w = '../../results_job_data/result_data/IOmode_by_volumn/IO_mode_w_count.csv'
+result_file_name_r = '/home/export/mount_test/swstorage/results_job_data/result_data/IOmode_by_volumn/IO_mode_r_count.csv'
+result_file_name_w = '/home/export/mount_test/swstorage/results_job_data/result_data/IOmode_by_volumn/IO_mode_w_count.csv'
 
 classify_volumn_percent = 0.5
 classify_volumn_Nto1_percent = 0.3

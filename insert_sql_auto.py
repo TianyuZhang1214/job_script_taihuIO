@@ -16,14 +16,14 @@ from deal_generator import deal_all_message
 #Last JOBID queried before: 40645719
 #40786081
 #40880389
-startjobid = 40645719
+startjobid = 41000000
 jobid_interval = 10000
 thread_count=1
 size_ip = 50
 
-abnormal_job_file = "../../results_job_data/collect_data/insert_data/abnormal_insert_job.csv"
-job_file = "../../results_job_data/collect_data/insert_data/insert_job_completed.csv"
-job_file_all = "../../results_job_data/collect_data/insert_data/insert_job_all.csv"
+abnormal_job_file = "/home/export/mount_test/swstorage/results_job_data/collect_data/insert_data/abnormal_insert_job.csv"
+job_file = "/home/export/mount_test/swstorage/results_job_data/collect_data/insert_data/insert_job_completed.csv"
+job_file_all = "/home/export/mount_test/swstorage/results_job_data/collect_data/insert_data/insert_job_all.csv"
 
 def save_job(jobid, file_name):
     csvfile = file(file_name,'ab')

@@ -1,4 +1,4 @@
-fwd_file = '../../results/fn_result_all/fn-usage-high.csv'
+fwd_file = '/home/export/mount_test/swstorage/results/fn_result_all/fn-usage-high.csv'
 
 def read_fwd_usage():
     f = open(fwd_file, "r")

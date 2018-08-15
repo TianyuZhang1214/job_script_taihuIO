@@ -7,7 +7,7 @@ import json
 #import matplotlib.patches as patches
 import numpy as np
 import sys
-sys.path.insert(0,"../../job")
+sys.path.insert(0,"/home/export/mount_test/swstorage/job")
 sys.path.append("../query_script")
 from job_ip_all import get_re_jobid_CNC_runtime_corehour as get_re_jobid
 #sys.path.append("../ELK")
@@ -45,7 +45,7 @@ def draw_2d(x, y):
     plt.show()
 
 def save_all(jobID, resultr_band, resultw_band, resultr_iops, resultw_iops, resultr_open, resultw_close, pe_r, pe_w, file_open, title):
-    f=file('../../results_job_data/collect_data/'+ title+'/all.csv','ab')
+    f=file('/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/all.csv','ab')
     for i in range(len(resultr_band)):
         if(abs(resultr_band[i]) > sys.float_info.epsilon or \
         abs(resultr_band[i]) > sys.float_info.epsilon or \
@@ -211,8 +211,8 @@ def save_IOphase_mode(jobID, CNC ,run_time, corehour, resultr_band, resultw_band
 resultr_iops, resultw_iops, resultr_open, resultw_close, resultr_size, resultw_size, \
 pe_r, pe_w, file_all_count, title):
     
-    file_name_r = '../../results_job_data/collect_data/'+ title+'/IO_phase_r.csv'
-    file_name_w = '../../results_job_data/collect_data/'+ title+'/IO_phase_w.csv'
+    file_name_r = '/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/IO_phase_r.csv'
+    file_name_w = '/home/export/mount_test/swstorage/results_job_data/collect_data/'+ title+'/IO_phase_w.csv'
     IO_mode_r, IO_mode_w, IO_volumn_r, IO_volumn_w, \
     time_r_start, time_r_end, time_w_start, time_w_end, time_r, time_w = \
     compute_IOphase_mode(resultr_band, resultw_band, resultr_iops, resultw_iops, \
